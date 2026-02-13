@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a192f;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+.decision-card {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(71, 85, 105, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.decision-card:hover {
+  transform: translateY(-12px);
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.2);
+}
+
+.recommended-badge {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+body {
+  background: linear-gradient(180deg, #0a192f 0%, #172a45 50%, #0a192f 100%);
+  min-height: 100vh;
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
