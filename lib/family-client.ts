@@ -85,7 +85,7 @@ export async function getCurrentFamilyContext() {
 
   const deviceSession = getDeviceSessionFromDocument();
   if (!deviceSession) {
-    return { user: null, familyId: null, deviceId: null, source: null as const, error: admin.error ?? "Ingen familie." };
+    return { user: null, familyId: null, deviceId: null, source: null, error: admin.error ?? "Ingen familie." };
   }
 
   const res = await supabase
@@ -95,21 +95,22 @@ export async function getCurrentFamilyContext() {
     .maybeSingle();
 
   if (res.error || !res.data) {
-    return { user: null, familyId: null, deviceId: null, source: null as const, error: "Enheten er ikke gyldig." };
+    return { user: null, familyId: null, deviceId: null, source: null, error: "Enheten er ikke gyldig." };
   }
 
   if (res.data.revoked_at) {
-    return { user: null, familyId: null, deviceId: null, source: null as const, error: "Enheten er deaktivert." };
+    return { user: null, familyId: null, deviceId: null, source: null, error: "Enheten er deaktivert." };
   }
 
   if (res.data.token_hash !== deviceSession.tokenHash) {
-    return { user: null, familyId: null, deviceId: null, source: null as const, error: "Enheten er ikke gyldig." };
+    return { user: null, familyId: null, deviceId: null, source: null, error: "Enheten er ikke gyldig." };
   }
 
   const familyId = (res.data.family_id as string | undefined) ?? null;
   if (!familyId) {
-    return { user: null, familyId: null, deviceId: null, source: null as const, error: "Familie ikke funnet." };
+    return { user: null, familyId: null, deviceId: null, source: null, error: "Familie ikke funnet." };
   }
 
   return { user: null, familyId, deviceId: res.data.id as string, source: "device" as const, error: null };
 }
+

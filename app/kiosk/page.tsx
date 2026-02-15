@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { hashToken, setDeviceSessionCookie } from "@/lib/device-session";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -13,7 +13,7 @@ type DeviceRow = {
   token_hash: string;
 };
 
-export default function KioskPage() {
+function KioskPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
@@ -86,5 +86,13 @@ export default function KioskPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function KioskPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-slate-950 px-4 py-10 text-slate-100" />}>
+      <KioskPageContent />
+    </Suspense>
   );
 }

@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { getDeviceSessionFromRequest } from "@/lib/device-session";
 
@@ -20,6 +20,10 @@ type FamilyRow = {
   approval_mode: "REQUIRE_APPROVAL" | "AUTO_APPROVE";
 };
 
+type ProfileRow = {
+  family_id: string | null;
+};
+
 function getServerSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -27,7 +31,7 @@ function getServerSupabase() {
   return createClient(url, key);
 }
 
-async function getFamilyIdForAdminToken(client: ReturnType<typeof createClient>, token: string) {
+async function getFamilyIdForAdminToken(client: SupabaseClient<any>, token: string) {
   const userRes = await client.auth.getUser(token);
   if (userRes.error || !userRes.data.user) return null;
   const profileRes = await client
@@ -36,7 +40,8 @@ async function getFamilyIdForAdminToken(client: ReturnType<typeof createClient>,
     .eq("user_id", userRes.data.user.id)
     .maybeSingle();
   if (profileRes.error) return null;
-  return (profileRes.data?.family_id as string | undefined) ?? null;
+  const profile = profileRes.data ? (profileRes.data as unknown as ProfileRow) : null;
+  return profile?.family_id ?? null;
 }
 
 export async function POST(request: Request) {
@@ -157,3 +162,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true, status });
 }
+
