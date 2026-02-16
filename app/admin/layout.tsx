@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { getCurrentAdminContext } from "@/lib/family-client";
+import { getAdminSetupStatus, getCurrentAdminContext } from "@/lib/family-client";
 import { supabase } from "@/lib/supabaseClient";
 
 const navItems = [
@@ -31,6 +31,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         router.replace("/login");
         return;
       }
+
+      const setup = await getAdminSetupStatus();
+      if (setup.needsOnboarding) {
+        router.replace("/onboarding");
+        return;
+      }
+
       setLoading(false);
     };
 

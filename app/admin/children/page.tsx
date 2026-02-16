@@ -1,13 +1,15 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { AVATAR_OPTIONS, DEFAULT_AVATAR_KEY, getAvatarByKey } from "@/lib/avatars";
 import { getCurrentAdminContext } from "@/lib/family-client";
 import { supabase } from "@/lib/supabaseClient";
 
 type ChildRow = {
   id: string;
   name: string;
+  avatar_key: string | null;
   active: boolean;
 };
 
@@ -32,6 +34,7 @@ export default function AdminChildrenPage() {
   const [children, setChildren] = useState<ChildRow[]>([]);
   const [statsByChild, setStatsByChild] = useState<Record<string, ChildStats>>({});
   const [name, setName] = useState("");
+  const [avatarKey, setAvatarKey] = useState(DEFAULT_AVATAR_KEY);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -41,7 +44,7 @@ export default function AdminChildrenPage() {
 
     const childrenRes = await supabase
       .from("children")
-      .select("id, name, active")
+      .select("id, name, avatar_key, active")
       .eq("family_id", id)
       .order("created_at", { ascending: false });
 
@@ -107,6 +110,7 @@ export default function AdminChildrenPage() {
     const res = await supabase.from("children").insert({
       family_id: familyId,
       name: name.trim(),
+      avatar_key: avatarKey,
       active: true,
     });
 
@@ -116,6 +120,7 @@ export default function AdminChildrenPage() {
     }
 
     setName("");
+    setAvatarKey(DEFAULT_AVATAR_KEY);
     setStatus("Barn opprettet.");
     await load();
   };
@@ -130,6 +135,16 @@ export default function AdminChildrenPage() {
     await load();
   };
 
+  const updateAvatar = async (childId: string, nextAvatarKey: string) => {
+    setStatus("");
+    const res = await supabase.from("children").update({ avatar_key: nextAvatarKey }).eq("id", childId);
+    if (res.error) {
+      setStatus(`Feil: ${res.error.message}`);
+      return;
+    }
+    setChildren((prev) => prev.map((child) => (child.id === childId ? { ...child, avatar_key: nextAvatarKey } : child)));
+  };
+
   if (loading) return <div className="text-slate-300">Laster...</div>;
 
   const isError = status.startsWith("Feil:");
@@ -139,8 +154,8 @@ export default function AdminChildrenPage() {
     <section className="space-y-5">
       <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 md:p-5">
         <h3 className="mb-3 text-base font-semibold tracking-tight">Legg til barn</h3>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <label className="flex-1 space-y-1.5">
+        <div className="flex flex-col gap-3">
+          <label className="space-y-1.5">
             <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Navn</span>
             <input
               value={name}
@@ -149,11 +164,31 @@ export default function AdminChildrenPage() {
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
             />
           </label>
+
+          <div>
+            <div className="mb-1.5 text-xs font-medium uppercase tracking-wide text-slate-400">Velg avatar</div>
+            <div className="flex flex-wrap gap-2">
+              {AVATAR_OPTIONS.map((avatar) => (
+                <button
+                  key={avatar.key}
+                  type="button"
+                  onClick={() => setAvatarKey(avatar.key)}
+                  className={`rounded-lg border px-3 py-2 text-lg ${
+                    avatarKey === avatar.key ? "border-emerald-400 bg-emerald-900/30" : "border-slate-700 bg-slate-950"
+                  }`}
+                  title={avatar.label}
+                >
+                  {avatar.emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={() => void createChild()}
             disabled={disableCreate}
-            className="self-end rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+            className="self-start rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
           >
             Opprett
           </button>
@@ -183,10 +218,14 @@ export default function AdminChildrenPage() {
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {children.map((child) => {
               const stats = statsByChild[child.id] ?? { dueOre: 0, paidOre: 0, totalCount: 0 };
+              const avatar = getAvatarByKey(child.avatar_key);
               return (
                 <div key={child.id} className="rounded-xl border border-slate-800 bg-slate-950 p-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <div className="text-sm font-semibold text-slate-100">{child.name}</div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-100">
+                      <span className="text-lg">{avatar.emoji}</span>
+                      <span>{child.name}</span>
+                    </div>
                     <span
                       className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
                         child.active ? "bg-emerald-950/60 text-emerald-300" : "bg-slate-800 text-slate-300"
@@ -220,7 +259,8 @@ export default function AdminChildrenPage() {
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-800/70 text-slate-300">
             <tr>
-              <th className="px-4 py-3">Navn</th>
+              <th className="px-4 py-3">Barn</th>
+              <th className="px-4 py-3">Avatar</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Handling</th>
             </tr>
@@ -228,7 +268,25 @@ export default function AdminChildrenPage() {
           <tbody>
             {children.map((child) => (
               <tr key={child.id} className="border-t border-slate-800 text-slate-100">
-                <td className="px-4 py-3">{child.name}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{getAvatarByKey(child.avatar_key).emoji}</span>
+                    <span>{child.name}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <select
+                    value={child.avatar_key ?? DEFAULT_AVATAR_KEY}
+                    onChange={(e) => void updateAvatar(child.id, e.target.value)}
+                    className="rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5"
+                  >
+                    {AVATAR_OPTIONS.map((avatar) => (
+                      <option key={avatar.key} value={avatar.key}>
+                        {avatar.emoji} {avatar.label}
+                      </option>
+                    ))}
+                  </select>
+                </td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
@@ -259,7 +317,7 @@ export default function AdminChildrenPage() {
             ))}
             {children.length === 0 && (
               <tr>
-                <td className="px-4 py-10 text-center text-slate-400" colSpan={3}>
+                <td className="px-4 py-10 text-center text-slate-400" colSpan={4}>
                   Ingen barn enda. Legg til forste barn over.
                 </td>
               </tr>

@@ -1,15 +1,26 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getAvatarByKey } from "@/lib/avatars";
 import { getCurrentFamilyContext } from "@/lib/family-client";
 import { supabase } from "@/lib/supabaseClient";
 
 type ChildRow = {
   id: string;
   name: string;
+  avatar_key: string | null;
   active: boolean;
 };
+
+const cardColors = [
+  "from-cyan-500 to-blue-500",
+  "from-emerald-500 to-lime-500",
+  "from-orange-500 to-amber-500",
+  "from-fuchsia-500 to-pink-500",
+  "from-violet-500 to-indigo-500",
+  "from-rose-500 to-red-500",
+];
 
 export default function KidsPage() {
   const [children, setChildren] = useState<ChildRow[]>([]);
@@ -27,7 +38,7 @@ export default function KidsPage() {
 
       const res = await supabase
         .from("children")
-        .select("id, name, active")
+        .select("id, name, avatar_key, active")
         .eq("family_id", ctx.familyId)
         .eq("active", true)
         .order("name", { ascending: true });
@@ -48,8 +59,8 @@ export default function KidsPage() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 md:px-8 md:py-10">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-2 text-3xl font-bold tracking-tight">Velg barn</h1>
-        <p className="mb-6 text-sm text-slate-400">Trykk pa en profil for a vise oppgaver.</p>
+        <h1 className="mb-2 text-4xl font-black tracking-tight">Velg barn</h1>
+        <p className="mb-6 text-sm text-slate-300">Trykk pa en profil for a vise oppgaver.</p>
 
         {status && (
           <div className="mb-6 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-300">
@@ -63,19 +74,23 @@ export default function KidsPage() {
         )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {children.map((child) => (
-            <Link
-              key={child.id}
-              href={`/kids/${child.id}`}
-              className="group rounded-2xl border border-slate-800 bg-slate-900 p-6 transition hover:-translate-y-0.5 hover:border-slate-600 hover:bg-slate-900/80"
-            >
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-800 text-xl font-semibold text-slate-200">
-                {child.name.slice(0, 1).toUpperCase()}
-              </div>
-              <div className="text-2xl font-semibold tracking-tight">{child.name}</div>
-              <div className="mt-2 text-sm text-slate-400 group-hover:text-slate-300">Trykk for a fortsette</div>
-            </Link>
-          ))}
+          {children.map((child, index) => {
+            const avatar = getAvatarByKey(child.avatar_key);
+            const gradient = cardColors[index % cardColors.length];
+            return (
+              <Link
+                key={child.id}
+                href={`/kids/${child.id}`}
+                className={`group rounded-2xl border border-slate-700 bg-gradient-to-br ${gradient} p-6 text-slate-950 shadow-lg transition hover:-translate-y-1 hover:shadow-2xl`}
+              >
+                <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/80 text-3xl">
+                  {avatar.emoji}
+                </div>
+                <div className="text-2xl font-black tracking-tight">{child.name}</div>
+                <div className="mt-2 text-sm font-semibold text-slate-900/80 group-hover:text-slate-900">Trykk for a fortsette</div>
+              </Link>
+            );
+          })}
         </div>
 
         {children.length === 0 && !status && (

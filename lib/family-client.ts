@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { getDeviceSessionFromDocument } from "@/lib/device-session";
 import { supabase } from "@/lib/supabaseClient";
@@ -7,6 +7,14 @@ export type ApprovalMode = "REQUIRE_APPROVAL" | "AUTO_APPROVE";
 
 type EnsureFamilyResult = {
   familyId: string | null;
+  error: string | null;
+};
+
+export type SetupStatus = {
+  familyId: string | null;
+  hasChildren: boolean;
+  hasTasks: boolean;
+  needsOnboarding: boolean;
   error: string | null;
 };
 
@@ -63,6 +71,66 @@ export async function ensureFamilyForUser(user: { id: string; email?: string | n
   return { familyId, error: null };
 }
 
+export async function getAdminSetupStatus(): Promise<SetupStatus> {
+  const { user, error: userError } = await getCurrentSessionUser();
+  if (userError || !user) {
+    return {
+      familyId: null,
+      hasChildren: false,
+      hasTasks: false,
+      needsOnboarding: false,
+      error: userError ?? "Ikke innlogget.",
+    };
+  }
+
+  const profile = await getFamilyIdForUser(user.id);
+  if (profile.error) {
+    return {
+      familyId: null,
+      hasChildren: false,
+      hasTasks: false,
+      needsOnboarding: true,
+      error: profile.error,
+    };
+  }
+
+  if (!profile.familyId) {
+    return {
+      familyId: null,
+      hasChildren: false,
+      hasTasks: false,
+      needsOnboarding: true,
+      error: null,
+    };
+  }
+
+  const [childrenRes, tasksRes] = await Promise.all([
+    supabase.from("children").select("id", { head: true, count: "exact" }).eq("family_id", profile.familyId),
+    supabase.from("tasks").select("id", { head: true, count: "exact" }).eq("family_id", profile.familyId),
+  ]);
+
+  if (childrenRes.error || tasksRes.error) {
+    return {
+      familyId: profile.familyId,
+      hasChildren: false,
+      hasTasks: false,
+      needsOnboarding: true,
+      error: childrenRes.error?.message ?? tasksRes.error?.message ?? "Kunne ikke lese setup-status.",
+    };
+  }
+
+  const hasChildren = (childrenRes.count ?? 0) > 0;
+  const hasTasks = (tasksRes.count ?? 0) > 0;
+
+  return {
+    familyId: profile.familyId,
+    hasChildren,
+    hasTasks,
+    needsOnboarding: !hasChildren || !hasTasks,
+    error: null,
+  };
+}
+
 export async function getCurrentAdminContext() {
   const { user, error: userError } = await getCurrentSessionUser();
   if (userError || !user) {
@@ -113,4 +181,3 @@ export async function getCurrentFamilyContext() {
 
   return { user: null, familyId, deviceId: res.data.id as string, source: "device" as const, error: null };
 }
-
