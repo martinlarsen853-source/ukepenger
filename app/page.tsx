@@ -6,14 +6,33 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function HomePage() {
   const [hasSession, setHasSession] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     let mounted = true;
 
     const run = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!mounted) return;
-      setHasSession(Boolean(data.session));
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (!mounted) return;
+        if (error) {
+          setChecking(false);
+          return;
+        }
+
+        const sessionExists = Boolean(data.session);
+        setHasSession(sessionExists);
+
+        if (sessionExists) {
+          window.location.replace("/admin/inbox");
+          return;
+        }
+
+        setChecking(false);
+      } catch {
+        // Keep landing page visible if session lookup fails.
+        if (mounted) setChecking(false);
+      }
     };
 
     void run();
@@ -22,6 +41,16 @@ export default function HomePage() {
       mounted = false;
     };
   }, []);
+
+  if (checking) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+        <div className="flex min-h-screen items-center justify-center">
+          <p className="text-sm text-slate-300">Sender deg til admin...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
