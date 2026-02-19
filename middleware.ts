@@ -1,8 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { KIOSK_COOKIE_NAME } from "@/lib/device-session";
 
 export async function middleware(req: NextRequest) {
-  if (req.nextUrl.pathname !== "/") {
+  const pathname = req.nextUrl.pathname;
+
+  if (pathname.startsWith("/kiosk/claim")) {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/kids")) {
+    const kioskCookie = req.cookies.get(KIOSK_COOKIE_NAME)?.value;
+    if (kioskCookie) {
+      return NextResponse.next();
+    }
+
+    const url = req.nextUrl.clone();
+    url.pathname = "/kiosk";
+    return NextResponse.redirect(url);
+  }
+
+  if (pathname !== "/") {
     return NextResponse.next();
   }
 
@@ -37,6 +55,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/", "/kids/:path*", "/kiosk/claim"],
 };
 
