@@ -4,13 +4,13 @@ import { KIOSK_COOKIE_NAME } from "@/lib/device-session";
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
+  const kioskCookie = req.cookies.get(KIOSK_COOKIE_NAME)?.value;
 
-  if (pathname.startsWith("/kiosk/claim")) {
+  if (pathname === "/kiosk" || pathname.startsWith("/kiosk/claim") || pathname.startsWith("/api/kids")) {
     return NextResponse.next();
   }
 
   if (pathname.startsWith("/kids")) {
-    const kioskCookie = req.cookies.get(KIOSK_COOKIE_NAME)?.value;
     if (kioskCookie) {
       return NextResponse.next();
     }
@@ -55,6 +55,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/kids/:path*", "/kiosk/claim"],
+  matcher: ["/", "/kids/:path*", "/kiosk", "/kiosk/claim", "/api/kids/:path*"],
 };
 
