@@ -8,7 +8,7 @@ type FamilyRow = {
   id: string;
 };
 
-export async function ensureFamilyForUser(supabase: SupabaseClient, userId: string) {
+export async function ensureFamilyForUser(supabase: SupabaseClient, userId: string): Promise<string> {
   const profileRes = await supabase
     .from("profiles")
     .select("family_id")

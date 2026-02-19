@@ -1,10 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { generateDeviceCode, generateDeviceSecret, hashToken } from "@/lib/device-session";
 import { ensureFamilyForUser } from "@/lib/ensure-family";
 
 type AuthContext = {
-  supabase: ReturnType<typeof createClient>;
+  supabase: SupabaseClient;
   userId: string;
 };
 
@@ -40,7 +40,7 @@ async function getAuthContextForToken(token: string): Promise<AuthContext | null
   return { supabase, userId: userRes.data.user.id };
 }
 
-async function generateUniqueCode(supabase: AuthContext["supabase"]) {
+async function generateUniqueCode(supabase: SupabaseClient) {
   for (let i = 0; i < 10; i += 1) {
     const candidate = await generateDeviceCode(8);
     const existsRes = await supabase.from("devices").select("id").eq("device_code", candidate).maybeSingle();
