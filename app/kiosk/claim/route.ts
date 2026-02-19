@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 
     const result = await supabase
       .from("devices")
-      .select("id, device_secret, token_hash")
+      .select("id, device_secret, active, revoked_at")
       .eq("device_code", code)
       .single();
 
@@ -47,8 +47,17 @@ export async function GET(request: Request) {
       return redirectKiosk("invalid_device");
     }
 
-    const row = result.data as { id: string; device_secret: string | null; token_hash: string | null };
-    if (!row.device_secret || row.device_secret !== secret) {
+    const row = result.data as {
+      id: string;
+      device_secret: string | null;
+      active: boolean;
+      revoked_at: string | null;
+    };
+    if (!row.active || row.revoked_at || !row.device_secret) {
+      return redirectKiosk("invalid_device");
+    }
+
+    if (row.device_secret !== secret) {
       return redirectKiosk("invalid_secret");
     }
 
