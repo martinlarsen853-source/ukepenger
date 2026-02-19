@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAvatarByKey } from "@/lib/avatars";
 
@@ -21,6 +22,7 @@ const cardColors = [
 ];
 
 export default function KidsPage() {
+  const router = useRouter();
   const [children, setChildren] = useState<ChildRow[]>([]);
   const [status, setStatus] = useState("Laster...");
   const [showLoginLink, setShowLoginLink] = useState(false);
@@ -31,11 +33,16 @@ export default function KidsPage() {
         method: "GET",
         credentials: "include",
       });
-      const payload = (await res.json()) as { error?: string; children?: ChildRow[] };
+      const payload = (await res.json()) as { error?: string; children?: ChildRow[]; selectedChildId?: string | null };
 
       if (!res.ok || payload.error) {
         setStatus(payload.error ?? "Denne enheten er ikke koblet til en familie.");
         setShowLoginLink(true);
+        return;
+      }
+
+      if (payload.selectedChildId) {
+        router.replace(`/kids/${payload.selectedChildId}`);
         return;
       }
 
@@ -45,7 +52,7 @@ export default function KidsPage() {
     };
 
     void run();
-  }, []);
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 md:px-8 md:py-10">
