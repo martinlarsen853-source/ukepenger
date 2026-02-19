@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { KIOSK_COOKIE_NAME, getKioskCookieValue } from "@/lib/device-session";
+import { NextResponse } from "next/server";
+import { getKioskCookieValue } from "@/lib/device-session";
 import { getServiceSupabaseClient } from "@/lib/server-supabase";
 
 type DeviceRow = {
@@ -10,11 +10,13 @@ type DeviceRow = {
   revoked_at: string | null;
 };
 
-export async function GET(request: NextRequest) {
-  const code = request.nextUrl.searchParams.get("code")?.trim() ?? "";
-  const secret = request.nextUrl.searchParams.get("secret")?.trim() ?? "";
+export async function GET(request: Request) {
+  const queryString = request.url.includes("?") ? request.url.slice(request.url.indexOf("?") + 1) : "";
+  const params = new URLSearchParams(queryString);
+  const code = params.get("code")?.trim() ?? "";
+  const secret = params.get("secret")?.trim() ?? "";
 
-  const failUrl = new URL("/login", request.nextUrl.origin);
+  const failUrl = "https://www.ukepenger.no/login";
   if (!code || !secret) {
     return NextResponse.redirect(failUrl);
   }
@@ -39,8 +41,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(failUrl);
   }
 
-  const response = NextResponse.redirect(new URL("/kids", request.nextUrl.origin));
-  response.cookies.set(KIOSK_COOKIE_NAME, getKioskCookieValue(device.id, secret), {
+  const kioskValue = getKioskCookieValue(device.id, secret);
+  const response = NextResponse.redirect("https://www.ukepenger.no/kids");
+  response.cookies.set({
+    name: "uk_kiosk",
+    value: kioskValue,
     httpOnly: true,
     secure: true,
     sameSite: "lax",
