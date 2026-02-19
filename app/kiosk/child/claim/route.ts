@@ -92,14 +92,15 @@ export async function GET(request: Request) {
 
       if (!existingDeviceRes.error && existingDeviceRes.data) {
         const existingDevice = existingDeviceRes.data as DeviceRow;
+        const ds = existingDevice.device_secret;
         const validExisting =
           existingDevice.family_id === child.family_id &&
           existingDevice.active &&
           !existingDevice.revoked_at &&
-          existingDevice.device_secret;
+          ds;
 
-        if (validExisting) {
-          kioskValue = getKioskCookieValue(existingDevice.id, existingDevice.device_secret);
+        if (ds && validExisting) {
+          kioskValue = getKioskCookieValue(existingDevice.id, ds);
         }
       }
     }
