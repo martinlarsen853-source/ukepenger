@@ -52,14 +52,10 @@ export async function GET(request: Request) {
       return redirectKiosk("invalid_secret");
     }
 
-    if (!row.token_hash) {
-      return redirectKiosk("server_error");
-    }
-
     const response = NextResponse.redirect("https://www.ukepenger.no/kids", { status: 303 });
     response.cookies.set({
       name: "uk_kiosk",
-      value: row.token_hash,
+      value: `${row.id}:${row.device_secret}`,
       httpOnly: true,
       secure: true,
       sameSite: "lax",
