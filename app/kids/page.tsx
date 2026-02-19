@@ -1,16 +1,14 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getAvatarByKey } from "@/lib/avatars";
-import { getCurrentFamilyContext } from "@/lib/family-client";
-import { supabase } from "@/lib/supabaseClient";
 
 type ChildRow = {
   id: string;
   name: string;
   avatar_key: string | null;
-  active: boolean;
+  color?: string | null;
 };
 
 const cardColors = [
@@ -25,32 +23,25 @@ const cardColors = [
 export default function KidsPage() {
   const [children, setChildren] = useState<ChildRow[]>([]);
   const [status, setStatus] = useState("Laster...");
-  const [showKioskLink, setShowKioskLink] = useState(false);
+  const [showLoginLink, setShowLoginLink] = useState(false);
 
   useEffect(() => {
     const run = async () => {
-      const ctx = await getCurrentFamilyContext();
-      if (!ctx.familyId) {
-        setStatus("Denne enheten er ikke koblet til en familie.");
-        setShowKioskLink(true);
+      const res = await fetch("/api/kids/bootstrap", {
+        method: "GET",
+        credentials: "include",
+      });
+      const payload = (await res.json()) as { error?: string; children?: ChildRow[] };
+
+      if (!res.ok || payload.error) {
+        setStatus(payload.error ?? "Denne enheten er ikke koblet til en familie.");
+        setShowLoginLink(true);
         return;
       }
 
-      const res = await supabase
-        .from("children")
-        .select("id, name, avatar_key, active")
-        .eq("family_id", ctx.familyId)
-        .eq("active", true)
-        .order("name", { ascending: true });
-
-      if (res.error) {
-        setStatus(`Feil: ${res.error.message}`);
-        return;
-      }
-
-      setChildren((res.data ?? []) as ChildRow[]);
+      setChildren(payload.children ?? []);
       setStatus("");
-      setShowKioskLink(false);
+      setShowLoginLink(false);
     };
 
     void run();
@@ -59,15 +50,15 @@ export default function KidsPage() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 md:px-8 md:py-10">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-2 text-4xl font-black tracking-tight">Velg barn</h1>
+        <h1 className="mb-2 text-4xl font-black tracking-tight">Velg profil</h1>
         <p className="mb-6 text-sm text-slate-300">Trykk pa en profil for a vise oppgaver.</p>
 
         {status && (
           <div className="mb-6 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-300">
             <div>{status}</div>
-            {showKioskLink && (
-              <Link href="/kiosk" className="mt-2 inline-flex text-slate-100 underline underline-offset-4">
-                Koble til kiosk
+            {showLoginLink && (
+              <Link href="/login" className="mt-2 inline-flex text-slate-100 underline underline-offset-4">
+                Gaa til login
               </Link>
             )}
           </div>

@@ -1,11 +1,9 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { getAvatarByKey } from "@/lib/avatars";
-import { getCurrentFamilyContext } from "@/lib/family-client";
-import { supabase } from "@/lib/supabaseClient";
 
 type ChildRow = {
   id: string;
@@ -18,11 +16,6 @@ type TaskRow = {
   title: string;
   amount_ore: number;
   active: boolean;
-};
-
-type ChildTaskSettingRow = {
-  task_id: string;
-  enabled: boolean;
 };
 
 const cardColors = [
@@ -44,61 +37,42 @@ export default function KidTaskPage() {
 
   const [child, setChild] = useState<ChildRow | null>(null);
   const [tasks, setTasks] = useState<TaskRow[]>([]);
-  const [enabledMap, setEnabledMap] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState("Laster...");
-  const [showKioskLink, setShowKioskLink] = useState(false);
+  const [showLoginLink, setShowLoginLink] = useState(false);
   const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
   const [confirmations, setConfirmations] = useState<Record<string, number>>({});
   const [nowTs, setNowTs] = useState<number>(() => Date.now());
 
   useEffect(() => {
     const run = async () => {
-      const ctx = await getCurrentFamilyContext();
-      if (!ctx.familyId) {
-        setStatus("Denne enheten er ikke koblet til en familie.");
-        setShowKioskLink(true);
+      const res = await fetch(`/api/kids/tasks?childId=${encodeURIComponent(childId)}`, {
+        method: "GET",
+        credentials: "include",
+      });
+      const payload = (await res.json()) as {
+        error?: string;
+        child?: ChildRow;
+        tasks?: TaskRow[];
+        cooldowns?: Record<string, number>;
+      };
+
+      if (!res.ok || payload.error || !payload.child) {
+        setStatus(payload.error ?? "Klarte ikke laste barn/oppgaver.");
+        setShowLoginLink(true);
         return;
       }
 
-      setShowKioskLink(false);
-
-      const [childRes, taskRes, settingsRes] = await Promise.all([
-        supabase.from("children").select("id, name, avatar_key").eq("id", childId).eq("family_id", ctx.familyId).maybeSingle(),
-        supabase.from("tasks").select("id, title, amount_ore, active").eq("family_id", ctx.familyId).eq("active", true).order("title", { ascending: true }),
-        supabase.from("child_task_settings").select("task_id, enabled").eq("child_id", childId),
-      ]);
-
-      if (childRes.error || !childRes.data) {
-        setStatus(`Feil: ${childRes.error?.message ?? "Barn ikke funnet."}`);
-        return;
-      }
-      if (taskRes.error) {
-        setStatus(`Feil: ${taskRes.error.message}`);
-        return;
-      }
-      if (settingsRes.error) {
-        setStatus(`Feil: ${settingsRes.error.message}`);
-        return;
-      }
-
-      const map: Record<string, boolean> = {};
-      for (const row of (settingsRes.data ?? []) as ChildTaskSettingRow[]) {
-        map[row.task_id] = row.enabled;
-      }
-
-      setChild(childRes.data as ChildRow);
-      setTasks((taskRes.data ?? []) as TaskRow[]);
-      setEnabledMap(map);
+      setChild(payload.child);
+      setTasks(payload.tasks ?? []);
+      setCooldowns(payload.cooldowns ?? {});
+      setShowLoginLink(false);
       setStatus("");
     };
 
     void run();
   }, [childId]);
 
-  const visibleTasks = useMemo(
-    () => tasks.filter((task) => enabledMap[task.id] !== false),
-    [tasks, enabledMap]
-  );
+  const visibleTasks = useMemo(() => tasks.filter((task) => task.active), [tasks]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -125,18 +99,13 @@ export default function KidTaskPage() {
 
   const submitClaim = async (taskId: string) => {
     setStatus("");
-    const currentTs = Date.now();
+    const currentTs = nowTs;
     setCooldowns((prev) => ({ ...prev, [taskId]: currentTs + 10_000 }));
 
-    const sessionRes = await supabase.auth.getSession();
-    const accessToken = sessionRes.data.session?.access_token;
-
-    const res = await fetch("/api/claims/create", {
+    const res = await fetch("/api/kids/claim", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      },
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ childId, taskId }),
     });
 
@@ -146,13 +115,11 @@ export default function KidTaskPage() {
       return;
     }
 
-    setConfirmations((prev) => ({ ...prev, [taskId]: Date.now() + 2_500 }));
-
+    setConfirmations((prev) => ({ ...prev, [taskId]: nowTs + 2_500 }));
     if (payload.status === "APPROVED") {
       setStatus("Sendt! Kravet ble auto-godkjent.");
       return;
     }
-
     setStatus("Sendt! Kravet ligger til godkjenning.");
   };
 
@@ -174,7 +141,7 @@ export default function KidTaskPage() {
               href="/kids"
               className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
             >
-              Bytt barn
+              Bytt profil
             </Link>
           </div>
 
@@ -192,9 +159,9 @@ export default function KidTaskPage() {
             }`}
           >
             <span>{status}</span>
-            {showKioskLink && (
-              <Link href="/kiosk" className="ml-2 inline-flex text-slate-100 underline underline-offset-4">
-                Koble til kiosk
+            {showLoginLink && (
+              <Link href="/login" className="ml-2 inline-flex text-slate-100 underline underline-offset-4">
+                Gaa til login
               </Link>
             )}
           </p>
@@ -228,9 +195,7 @@ export default function KidTaskPage() {
                     />
                   </div>
                 )}
-                {justSubmitted && (
-                  <div className="pointer-events-none absolute right-3 top-3 text-xl animate-pulse">🎉✨</div>
-                )}
+                {justSubmitted && <div className="pointer-events-none absolute right-3 top-3 text-xs font-black uppercase">OK</div>}
               </button>
             );
           })}
@@ -238,7 +203,7 @@ export default function KidTaskPage() {
 
         {visibleTasks.length === 0 && (
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
-            Ingen synlige oppgaver for dette barnet.
+            Ingen synlige oppgaver for denne profilen.
           </div>
         )}
       </div>

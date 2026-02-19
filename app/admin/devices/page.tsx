@@ -1,16 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCurrentAdminContext } from "@/lib/family-client";
-import { generateDeviceToken, hashToken } from "@/lib/device-session";
 import { supabase } from "@/lib/supabaseClient";
 
 type DeviceRow = {
   id: string;
   name: string;
-  token_hash: string;
+  device_code: string | null;
+  active: boolean;
   revoked_at: string | null;
   created_at: string;
+  updated_at?: string;
 };
 
 export default function AdminDevicesPage() {
@@ -18,26 +19,30 @@ export default function AdminDevicesPage() {
   const [devices, setDevices] = useState<DeviceRow[]>([]);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
-  const [qrLink, setQrLink] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [claimUrl, setClaimUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  const loadDevices = useCallback(async (nextFamilyId?: string) => {
-    const id = nextFamilyId ?? familyId;
-    if (!id) return;
+  const loadDevices = useCallback(
+    async (nextFamilyId?: string) => {
+      const id = nextFamilyId ?? familyId;
+      if (!id) return;
 
-    const res = await supabase
-      .from("devices")
-      .select("id, name, token_hash, revoked_at, created_at")
-      .eq("family_id", id)
-      .order("created_at", { ascending: false });
+      const res = await supabase
+        .from("devices")
+        .select("id, name, device_code, active, revoked_at, created_at, updated_at")
+        .eq("family_id", id)
+        .order("created_at", { ascending: false });
 
-    if (res.error) {
-      setStatus(`Feil: ${res.error.message}`);
-      return;
-    }
+      if (res.error) {
+        setStatus(`Feil: ${res.error.message}`);
+        return;
+      }
 
-    setDevices((res.data ?? []) as DeviceRow[]);
-  }, [familyId]);
+      setDevices((res.data ?? []) as DeviceRow[]);
+    },
+    [familyId]
+  );
 
   useEffect(() => {
     const run = async () => {
@@ -56,30 +61,38 @@ export default function AdminDevicesPage() {
     void run();
   }, [loadDevices]);
 
-  const createDevice = async () => {
-    if (!familyId) return;
-    setCreating(true);
+  const openQr = async (regenerate: boolean) => {
+    setBusy(true);
     setStatus("");
-    setQrLink(null);
+    setCopied(false);
 
-    const token = await generateDeviceToken();
-    const tokenHash = await hashToken(token);
-
-    const res = await supabase
-      .from("devices")
-      .insert({ family_id: familyId, token_hash: tokenHash })
-      .select("id")
-      .single();
-
-    setCreating(false);
-
-    if (res.error || !res.data) {
-      setStatus(`Feil: ${res.error?.message ?? "Kunne ikke opprette enhet."}`);
+    const sessionRes = await supabase.auth.getSession();
+    const accessToken = sessionRes.data.session?.access_token;
+    if (!accessToken) {
+      setBusy(false);
+      setStatus("Feil: Ikke innlogget.");
       return;
     }
 
-    const origin = typeof window !== "undefined" ? window.location.origin : "";
-    setQrLink(`${origin}/kiosk?token=${token}`);
+    const res = await fetch("/api/admin/devices/qr", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ regenerate }),
+    });
+
+    const payload = (await res.json()) as { error?: string; claimUrl?: string };
+    setBusy(false);
+
+    if (!res.ok || payload.error || !payload.claimUrl) {
+      setStatus(`Feil: ${payload.error ?? "Kunne ikke lage QR-lenke."}`);
+      return;
+    }
+
+    setClaimUrl(payload.claimUrl);
+    setStatus(regenerate ? "QR regenerert." : "QR klar.");
     await loadDevices();
   };
 
@@ -87,7 +100,7 @@ export default function AdminDevicesPage() {
     setStatus("");
     const res = await supabase
       .from("devices")
-      .update({ revoked_at: new Date().toISOString() })
+      .update({ revoked_at: new Date().toISOString(), active: false, updated_at: new Date().toISOString() })
       .eq("id", deviceId);
 
     if (res.error) {
@@ -98,22 +111,38 @@ export default function AdminDevicesPage() {
     await loadDevices();
   };
 
+  const qrImageUrl = useMemo(() => {
+    if (!claimUrl) return null;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(claimUrl)}`;
+  }, [claimUrl]);
+
   if (loading) return <div className="text-slate-300">Laster...</div>;
 
   const isError = status.startsWith("Feil:");
 
   return (
     <section className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold tracking-tight">Enheter</h2>
-        <button
-          type="button"
-          onClick={() => void createDevice()}
-          disabled={creating}
-          className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {creating ? "Lager..." : "Lag ny enhet"}
-        </button>
+      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+        <h3 className="mb-2 text-base font-semibold tracking-tight">Kiosk QR</h3>
+        <p className="mb-4 text-sm text-slate-300">Vis QR pa forelders telefon, skann pa iPad, og barnet lander rett pa /kids.</p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void openQr(false)}
+            disabled={busy}
+            className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {busy ? "Lager..." : "Vis QR"}
+          </button>
+          <button
+            type="button"
+            onClick={() => void openQr(true)}
+            disabled={busy}
+            className="rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Regenerer QR
+          </button>
+        </div>
       </div>
 
       {status && (
@@ -128,13 +157,21 @@ export default function AdminDevicesPage() {
         </p>
       )}
 
-      {qrLink && (
-        <div className="rounded-2xl border border-amber-700/60 bg-amber-950/40 p-4 text-sm text-amber-200">
-          <div className="mb-2 font-semibold">Ny enhet opprettet</div>
-          <div className="mb-2 text-xs uppercase tracking-wide text-amber-300">QR-lenke (vises kun en gang)</div>
-          <div className="break-all rounded-lg border border-amber-700/60 bg-amber-950/60 px-3 py-2 text-amber-100">
-            {qrLink}
-          </div>
+      {claimUrl && (
+        <div className="rounded-2xl border border-amber-700/60 bg-amber-950/40 p-4 text-sm text-amber-100">
+          <div className="mb-3 text-sm font-semibold text-amber-200">Skann QR med iPad</div>
+          {qrImageUrl && <img src={qrImageUrl} alt="Kiosk QR" className="h-[260px] w-[260px] rounded-lg border border-amber-700/70 bg-white p-2" />}
+          <div className="mt-3 break-all rounded-lg border border-amber-700/60 bg-amber-950/60 px-3 py-2 text-xs">{claimUrl}</div>
+          <button
+            type="button"
+            onClick={async () => {
+              await navigator.clipboard.writeText(claimUrl);
+              setCopied(true);
+            }}
+            className="mt-2 rounded-lg border border-amber-700/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-amber-100 transition hover:border-amber-500 hover:bg-amber-900/50"
+          >
+            {copied ? "Kopiert" : "Kopier lenke"}
+          </button>
         </div>
       )}
 
@@ -143,6 +180,7 @@ export default function AdminDevicesPage() {
           <thead className="bg-slate-800/70 text-slate-300">
             <tr>
               <th className="px-4 py-3">Navn</th>
+              <th className="px-4 py-3">Kode</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Opprettet</th>
               <th className="px-4 py-3">Handling</th>
@@ -152,18 +190,19 @@ export default function AdminDevicesPage() {
             {devices.map((device) => (
               <tr key={device.id} className="border-t border-slate-800 text-slate-100">
                 <td className="px-4 py-3">{device.name}</td>
+                <td className="px-4 py-3 font-mono text-xs">{device.device_code ?? "-"}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
-                      device.revoked_at ? "bg-slate-800 text-slate-300" : "bg-emerald-950/60 text-emerald-300"
+                      !device.active || device.revoked_at ? "bg-slate-800 text-slate-300" : "bg-emerald-950/60 text-emerald-300"
                     }`}
                   >
-                    {device.revoked_at ? "Deaktivert" : "Aktiv"}
+                    {!device.active || device.revoked_at ? "Deaktivert" : "Aktiv"}
                   </span>
                 </td>
                 <td className="px-4 py-3">{new Date(device.created_at).toLocaleString("nb-NO")}</td>
                 <td className="px-4 py-3">
-                  {device.revoked_at ? (
+                  {!device.active || device.revoked_at ? (
                     <span className="text-xs text-slate-500">Ingen handling</span>
                   ) : (
                     <button
@@ -179,7 +218,7 @@ export default function AdminDevicesPage() {
             ))}
             {devices.length === 0 && (
               <tr>
-                <td className="px-4 py-10 text-center text-slate-400" colSpan={4}>
+                <td className="px-4 py-10 text-center text-slate-400" colSpan={5}>
                   Ingen enheter opprettet enda.
                 </td>
               </tr>

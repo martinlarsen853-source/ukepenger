@@ -31,7 +31,7 @@ function getServerSupabase() {
   return createClient(url, key);
 }
 
-async function getFamilyIdForAdminToken(client: SupabaseClient<any>, token: string) {
+async function getFamilyIdForAdminToken(client: SupabaseClient, token: string) {
   const userRes = await client.auth.getUser(token);
   if (userRes.error || !userRes.data.user) return null;
   const profileRes = await client
@@ -162,4 +162,5 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true, status });
 }
+
 

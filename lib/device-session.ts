@@ -5,6 +5,7 @@ export type DeviceSession = {
 };
 
 const COOKIE_NAME = "spareapp_device";
+export const KIOSK_COOKIE_NAME = "uk_kiosk";
 
 function bytesToBase64Url(bytes: Uint8Array) {
   let binary = "";
@@ -68,6 +69,27 @@ export function getDeviceSessionFromRequest(request: Request) {
   return decodeDeviceSession(cookies[COOKIE_NAME]);
 }
 
+export type KioskCookieSession = {
+  deviceId: string;
+  deviceSecret: string;
+};
+
+export function parseKioskCookieValue(value: string | undefined | null): KioskCookieSession | null {
+  if (!value) return null;
+  const [deviceId, deviceSecret] = value.split(":");
+  if (!deviceId || !deviceSecret) return null;
+  return { deviceId, deviceSecret };
+}
+
+export function getKioskSessionFromRequest(request: Request) {
+  const cookies = parseCookieHeader(request.headers.get("cookie"));
+  return parseKioskCookieValue(cookies[KIOSK_COOKIE_NAME]);
+}
+
+export function getKioskCookieValue(deviceId: string, deviceSecret: string) {
+  return `${deviceId}:${deviceSecret}`;
+}
+
 export function setDeviceSessionCookie(session: DeviceSession, days = 30) {
   if (typeof document === "undefined") return;
   const value = encodeDeviceSession(session);
@@ -88,6 +110,33 @@ export async function generateDeviceToken() {
   } else {
     const { randomBytes } = await import("crypto");
     const buffer = randomBytes(32);
+    bytes.set(buffer);
+  }
+  return bytesToBase64Url(bytes);
+}
+
+export async function generateDeviceCode(length = 8) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(length);
+  if (globalThis.crypto?.getRandomValues) {
+    globalThis.crypto.getRandomValues(bytes);
+  } else {
+    const { randomBytes } = await import("crypto");
+    const buffer = randomBytes(length);
+    bytes.set(buffer);
+  }
+  return Array.from(bytes)
+    .map((byte) => chars[byte % chars.length])
+    .join("");
+}
+
+export async function generateDeviceSecret(length = 48) {
+  const bytes = new Uint8Array(length);
+  if (globalThis.crypto?.getRandomValues) {
+    globalThis.crypto.getRandomValues(bytes);
+  } else {
+    const { randomBytes } = await import("crypto");
+    const buffer = randomBytes(length);
     bytes.set(buffer);
   }
   return bytesToBase64Url(bytes);
