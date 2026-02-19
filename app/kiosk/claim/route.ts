@@ -48,7 +48,19 @@ export async function GET(request: Request) {
     }
 
     const row = result.data as { id: string; device_secret: string | null; token_hash: string | null };
-    if (row.device_secret !== secret) {
+    
+    // Debug: Log the values we're comparing
+    console.log("Kiosk claim debug:", {
+      code,
+      secret: secret ? "present" : "missing",
+      deviceId: row.id,
+      deviceSecret: row.device_secret ? "present" : "missing",
+      deviceSecretLength: row.device_secret?.length,
+      secretLength: secret.length,
+      secretsMatch: row.device_secret === secret
+    });
+    
+    if (!row.device_secret || row.device_secret !== secret) {
       return redirectKiosk("invalid_secret");
     }
 
