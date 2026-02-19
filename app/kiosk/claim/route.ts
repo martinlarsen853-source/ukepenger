@@ -1,12 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { getKioskCookieValue } from "@/lib/device-session";
+import { getServiceSupabaseClient } from "@/lib/server-supabase";
 
 export const runtime = "nodejs";
-
-function getEnv(key: string) {
-  const value = process.env[key];
-  return typeof value === "string" && value.length > 0 ? value : null;
-}
 
 function redirectKiosk(error: string) {
   return NextResponse.redirect(`https://www.ukepenger.no/kiosk?claim_error=${encodeURIComponent(error)}`, { status: 303 });
@@ -22,28 +18,22 @@ export async function GET(request: Request) {
       return redirectKiosk("missing_params");
     }
 
-    const supabaseUrl = getEnv("SUPABASE_URL") ?? getEnv("NEXT_PUBLIC_SUPABASE_URL");
-    const supabaseKey =
-      getEnv("SUPABASE_SERVICE_ROLE_KEY") ??
-      getEnv("SUPABASE_SERVICE_KEY") ??
-      getEnv("SUPABASE_ANON_KEY") ??
-      getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
-
-    if (!supabaseUrl || !supabaseKey) {
+    const supabase = getServiceSupabaseClient();
+    if (!supabase) {
       return redirectKiosk("server_error");
     }
-
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    });
 
     const result = await supabase
       .from("devices")
       .select("id, device_secret, active, revoked_at")
       .eq("device_code", code)
-      .single();
+      .eq("active", true)
+      .is("revoked_at", null)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    if (result.error) {
+    if (result.error || !result.data) {
       return redirectKiosk("invalid_device");
     }
 
@@ -64,13 +54,23 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect("https://www.ukepenger.no/kids", { status: 303 });
     response.cookies.set({
       name: "uk_kiosk",
-      value: `${row.id}:${row.device_secret}`,
+      value: getKioskCookieValue(row.id, row.device_secret),
       httpOnly: true,
       secure: true,
       sameSite: "lax",
       path: "/",
       domain: "ukepenger.no",
       maxAge: 31536000,
+    });
+    response.cookies.set({
+      name: "uk_kid",
+      value: "",
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      domain: "ukepenger.no",
+      maxAge: 0,
     });
     return response;
   } catch {
