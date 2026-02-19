@@ -2,6 +2,8 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { generateDeviceCode, generateDeviceSecret, hashToken } from "@/lib/device-session";
 
+export const runtime = "nodejs";
+
 type AuthContext = {
   supabase: SupabaseClient;
   userId: string;

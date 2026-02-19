@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { KIOSK_COOKIE_NAME, generateDeviceCode, generateDeviceSecret, getKioskCookieValue, hashToken, parseKioskCookieValue } from "@/lib/device-session";
+import { KIOSK_COOKIE_NAME, generateDeviceCode, generateDeviceSecret, getKioskCookieValue, hashToken } from "@/lib/device-session";
 import { verifyKioskRequest } from "@/lib/kiosk-auth";
 import { getServiceSupabaseClient } from "@/lib/server-supabase";
+
+export const runtime = "nodejs";
 
 type ChildQrRow = {
   child_id: string;
@@ -78,21 +80,14 @@ export async function GET(request: Request) {
     }
 
     const child = childRes.data as ChildRow;
-    const cookieHeader = request.headers.get("cookie") ?? "";
-    const kioskCookiePart = cookieHeader
-      .split(";")
-      .map((part) => part.trim())
-      .find((part) => part.startsWith(`${KIOSK_COOKIE_NAME}=`));
-    const kioskCookieValue = kioskCookiePart ? kioskCookiePart.slice(`${KIOSK_COOKIE_NAME}=`.length) : null;
-    const kioskSession = parseKioskCookieValue(kioskCookieValue);
     const validatedSession = await verifyKioskRequest(request);
 
     let kioskValue: string | null = null;
-    if (kioskSession && validatedSession && validatedSession.familyId === child.family_id) {
+    if (validatedSession && validatedSession.familyId === child.family_id) {
       const existingDeviceRes = await supabase
         .from("devices")
         .select("id, family_id, device_secret, active, revoked_at")
-        .eq("id", kioskSession.deviceId)
+        .eq("id", validatedSession.deviceId)
         .maybeSingle();
 
       if (!existingDeviceRes.error && existingDeviceRes.data) {
@@ -101,11 +96,10 @@ export async function GET(request: Request) {
           existingDevice.family_id === child.family_id &&
           existingDevice.active &&
           !existingDevice.revoked_at &&
-          existingDevice.device_secret &&
-          existingDevice.device_secret === kioskSession.deviceSecret;
+          existingDevice.device_secret;
 
         if (validExisting) {
-          kioskValue = getKioskCookieValue(existingDevice.id, kioskSession.deviceSecret);
+          kioskValue = getKioskCookieValue(existingDevice.id, existingDevice.device_secret);
         }
       }
     }
