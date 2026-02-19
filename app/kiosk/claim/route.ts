@@ -12,64 +12,77 @@ function getSupabaseAdmin() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-async function verifyAndClaimDevice(code: string, secret: string) {
+async function verifyAndClaimDevice(code: string, secret: string): Promise<string | null> {
   const supabase = getSupabaseAdmin();
 
-  // Preferred: RPC for atomic verify+claim that returns a cookie token
-  const rpc = await supabase
-    .rpc("kiosk_claim", { code, secret })
-    .select()
-    .maybeSingle();
-
-  if (!rpc.error && rpc.data) {
+  // Prefer atomic RPC if it exists; keep types fully "any" to avoid TS deep instantiation.
+  const rpc: any = await (supabase as any).rpc("kiosk_claim", { code, secret });
+  if (rpc && !rpc.error && rpc.data) {
+    const d = Array.isArray(rpc.data) ? rpc.data[0] : rpc.data;
     const token =
-      (rpc.data as any).kiosk_token ??
-      (rpc.data as any).token ??
-      (rpc.data as any).cookie ??
-      (rpc.data as any).uk_kiosk ??
-      null;
+      d?.kiosk_token ?? d?.token ?? d?.cookie ?? d?.uk_kiosk ?? null;
     if (typeof token === "string" && token.length > 0) return token;
   }
 
-  // Fallback: common table patterns
-  const candidates = [
-    { table: "kiosk_devices", codeCol: "claim_code", secretCol: "claim_secret", tokenCol: "kiosk_token", idCol: "id", claimedCol: "claimed_at" },
-    { table: "devices", codeCol: "claim_code", secretCol: "claim_secret", tokenCol: "kiosk_token", idCol: "id", claimedCol: "claimed_at" },
-    { table: "devices", codeCol: "code", secretCol: "secret", tokenCol: "kiosk_token", idCol: "id", claimedCol: "claimed_at" },
-  ] as const;
+  // Fallback to direct table lookup/update with any-typed client to avoid TS recursion.
+  const candidates: Array<{
+    table: string;
+    codeCol: string;
+    secretCol: string;
+    tokenCol: string;
+    idCol: string;
+    claimedCol: string;
+  }> = [
+    {
+      table: "kiosk_devices",
+      codeCol: "claim_code",
+      secretCol: "claim_secret",
+      tokenCol: "kiosk_token",
+      idCol: "id",
+      claimedCol: "claimed_at",
+    },
+    {
+      table: "devices",
+      codeCol: "claim_code",
+      secretCol: "claim_secret",
+      tokenCol: "kiosk_token",
+      idCol: "id",
+      claimedCol: "claimed_at",
+    },
+    {
+      table: "devices",
+      codeCol: "code",
+      secretCol: "secret",
+      tokenCol: "kiosk_token",
+      idCol: "id",
+      claimedCol: "claimed_at",
+    },
+  ];
+
+  const sb: any = supabase;
 
   for (const c of candidates) {
-    const sel = await supabase
+    const sel: any = await sb
       .from(c.table)
       .select(`${c.idCol},${c.tokenCol},${c.claimedCol}`)
-      .eq(c.codeCol as any, code)
-      .eq(c.secretCol as any, secret)
+      .eq(c.codeCol, code)
+      .eq(c.secretCol, secret)
       .maybeSingle();
 
-    if (sel.error || !sel.data) continue;
+    if (sel?.error || !sel?.data) continue;
 
     const token =
-      (sel.data as any)[c.tokenCol] ??
-      (sel.data as any).token ??
-      (sel.data as any).cookie ??
-      null;
+      sel.data?.[c.tokenCol] ?? sel.data?.token ?? sel.data?.cookie ?? null;
 
-    if (typeof token === "string" && token.length > 0) {
-      // mark claimed (best-effort)
-      const patch: Record<string, any> = {};
-      patch[c.claimedCol] = new Date().toISOString();
-      await supabase.from(c.table).update(patch).eq(c.idCol as any, (sel.data as any)[c.idCol]);
-      return token;
-    }
+    const id = sel.data?.[c.idCol];
 
-    // If no token column exists, fall back to device id as cookie value (minimal, but valid)
-    const id = (sel.data as any)[c.idCol];
-    if (typeof id === "string" && id.length > 0) {
-      const patch: Record<string, any> = {};
-      patch[c.claimedCol] = new Date().toISOString();
-      await supabase.from(c.table).update(patch).eq(c.idCol as any, id);
-      return id;
-    }
+    // best-effort claim mark
+    const patch: any = {};
+    patch[c.claimedCol] = new Date().toISOString();
+    if (id) await sb.from(c.table).update(patch).eq(c.idCol, id);
+
+    if (typeof token === "string" && token.length > 0) return token;
+    if (typeof id === "string" && id.length > 0) return id;
   }
 
   return null;
@@ -77,27 +90,19 @@ async function verifyAndClaimDevice(code: string, secret: string) {
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const code = url.searchParams.get("code")?.trim() || "";
-  const secret = url.searchParams.get("secret")?.trim() || "";
+  const code = (url.searchParams.get("code") || "").trim();
+  const secret = (url.searchParams.get("secret") || "").trim();
 
   if (!code || !secret) {
     return NextResponse.json({ error: "Missing code/secret" }, { status: 400 });
   }
 
-  let token: string | null = null;
-  try {
-    token = await verifyAndClaimDevice(code, secret);
-  } catch {
-    return NextResponse.json({ error: "Claim failed" }, { status: 500 });
-  }
-
+  const token = await verifyAndClaimDevice(code, secret);
   if (!token) {
     return NextResponse.json({ error: "Invalid device" }, { status: 401 });
   }
 
-  const res = NextResponse.redirect(new URL("/kids", "https://www.ukepenger.no"), {
-    status: 303,
-  });
+  const res = NextResponse.redirect("https://www.ukepenger.no/kids", { status: 303 });
 
   res.cookies.set({
     name: "uk_kiosk",
