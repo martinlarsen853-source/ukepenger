@@ -1,10 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { generateDeviceCode, generateDeviceSecret, hashToken } from "@/lib/device-session";
-import { getServiceSupabaseClient } from "@/lib/server-supabase";
+import { ensureFamilyForUser } from "@/lib/ensure-family";
 
-type ProfileRow = {
-  family_id: string | null;
+type AuthContext = {
+  supabase: ReturnType<typeof createClient>;
+  userId: string;
 };
 
 type DeviceRow = {
@@ -16,35 +17,33 @@ type DeviceRow = {
   revoked_at: string | null;
 };
 
-async function getFamilyIdForAdminToken(token: string) {
+async function getAuthContextForToken(token: string): Promise<AuthContext | null> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) return null;
 
-  const authClient = createClient(url, anonKey);
-  const userRes = await authClient.auth.getUser(token);
+  const supabase = createClient(url, anonKey, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+
+  const userRes = await supabase.auth.getUser(token);
   if (userRes.error || !userRes.data.user) return null;
 
-  const service = getServiceSupabaseClient();
-  if (!service) return null;
-
-  const profileRes = await service
-    .from("profiles")
-    .select("family_id")
-    .eq("user_id", userRes.data.user.id)
-    .maybeSingle();
-
-  if (profileRes.error || !profileRes.data) return null;
-  return (profileRes.data as ProfileRow).family_id;
+  return { supabase, userId: userRes.data.user.id };
 }
 
-async function generateUniqueCode() {
-  const service = getServiceSupabaseClient();
-  if (!service) return null;
-
+async function generateUniqueCode(supabase: AuthContext["supabase"]) {
   for (let i = 0; i < 10; i += 1) {
     const candidate = await generateDeviceCode(8);
-    const existsRes = await service.from("devices").select("id").eq("device_code", candidate).maybeSingle();
+    const existsRes = await supabase.from("devices").select("id").eq("device_code", candidate).maybeSingle();
     if (!existsRes.data) return candidate;
   }
   return null;
@@ -57,20 +56,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Mangler auth token." }, { status: 401 });
   }
 
-  const familyId = await getFamilyIdForAdminToken(bearerToken);
-  if (!familyId) {
-    return NextResponse.json({ error: "Fant ikke familie." }, { status: 403 });
+  const authContext = await getAuthContextForToken(bearerToken);
+  if (!authContext) {
+    return NextResponse.json({ error: "Ugyldig innlogging." }, { status: 401 });
   }
 
   const body = (await request.json().catch(() => ({}))) as { regenerate?: boolean };
   const regenerate = Boolean(body.regenerate);
 
-  const service = getServiceSupabaseClient();
-  if (!service) {
-    return NextResponse.json({ error: "Server mangler service role key." }, { status: 500 });
+  let familyId: string;
+  try {
+    familyId = await ensureFamilyForUser(authContext.supabase, authContext.userId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Kunne ikke klargjore familie.";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 
-  const existingRes = await service
+  const existingRes = await authContext.supabase
     .from("devices")
     .select("id, family_id, device_code, device_secret, active, revoked_at")
     .eq("family_id", familyId)
@@ -85,7 +87,7 @@ export async function POST(request: Request) {
   }
 
   const existing = (existingRes.data as DeviceRow | null) ?? null;
-  const code = existing?.device_code ?? (await generateUniqueCode());
+  const code = existing?.device_code ?? (await generateUniqueCode(authContext.supabase));
   if (!code) {
     return NextResponse.json({ error: "Klarte ikke generere unik kode." }, { status: 500 });
   }
@@ -95,7 +97,7 @@ export async function POST(request: Request) {
   const now = new Date().toISOString();
 
   if (existing) {
-    const updateRes = await service
+    const updateRes = await authContext.supabase
       .from("devices")
       .update({
         device_code: code,
@@ -111,7 +113,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: updateRes.error.message }, { status: 400 });
     }
   } else {
-    const insertRes = await service.from("devices").insert({
+    const insertRes = await authContext.supabase.from("devices").insert({
       family_id: familyId,
       name: "Kiosk",
       token_hash: tokenHash,
@@ -136,3 +138,4 @@ export async function POST(request: Request) {
     regenerated: regenerate,
   });
 }
+
