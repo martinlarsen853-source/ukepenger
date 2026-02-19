@@ -40,14 +40,12 @@ export async function GET(request: NextRequest) {
   }
 
   const response = NextResponse.redirect(new URL("/kids", request.nextUrl.origin));
-  response.cookies.set({
-    name: KIOSK_COOKIE_NAME,
-    value: getKioskCookieValue(device.id, secret),
+  response.cookies.set(KIOSK_COOKIE_NAME, getKioskCookieValue(device.id, secret), {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 90,
+    maxAge: 60 * 60 * 24 * 365,
   });
   return response;
 }
