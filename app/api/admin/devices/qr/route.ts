@@ -87,16 +87,45 @@ export async function POST(request: Request) {
   }
 
   const existing = (existingRes.data as DeviceRow | null) ?? null;
-  const code = existing?.device_code ?? (await generateUniqueCode(authContext.supabase));
+  const createNewDevice = Boolean(existing && regenerate);
+  const code = createNewDevice ? await generateUniqueCode(authContext.supabase) : existing?.device_code ?? (await generateUniqueCode(authContext.supabase));
   if (!code) {
     return NextResponse.json({ error: "Klarte ikke generere unik kode." }, { status: 500 });
   }
 
-  const secret = existing && !regenerate && existing.device_secret ? existing.device_secret : await generateDeviceSecret(48);
+  const secret = existing && !createNewDevice && existing.device_secret ? existing.device_secret : await generateDeviceSecret(48);
   const tokenHash = await hashToken(secret);
   const now = new Date().toISOString();
 
-  if (existing) {
+  if (existing && createNewDevice) {
+    const revokeRes = await authContext.supabase
+      .from("devices")
+      .update({
+        active: false,
+        revoked_at: now,
+        updated_at: now,
+      })
+      .eq("id", existing.id);
+
+    if (revokeRes.error) {
+      return NextResponse.json({ error: revokeRes.error.message }, { status: 400 });
+    }
+
+    const insertRes = await authContext.supabase.from("devices").insert({
+      family_id: familyId,
+      name: "Kiosk",
+      token_hash: tokenHash,
+      device_code: code,
+      device_secret: secret,
+      active: true,
+      revoked_at: null,
+      updated_at: now,
+    });
+
+    if (insertRes.error) {
+      return NextResponse.json({ error: insertRes.error.message }, { status: 400 });
+    }
+  } else if (existing) {
     const updateRes = await authContext.supabase
       .from("devices")
       .update({
@@ -120,6 +149,7 @@ export async function POST(request: Request) {
       device_code: code,
       device_secret: secret,
       active: true,
+      revoked_at: null,
       updated_at: now,
     });
 
