@@ -9,7 +9,7 @@ function getEnv(key: string) {
 }
 
 function redirectKiosk(error: string) {
-  return NextResponse.redirect(`https://www.ukepenger.no/kiosk?claim_error=${encodeURIComponent(error)}`, { status: 303 });
+  return NextResponse.redirect(`https://ukepenger.no/kiosk?claim_error=${encodeURIComponent(error)}`, { status: 303 });
 }
 
 export async function GET(request: Request) {
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
       return redirectKiosk("invalid_secret");
     }
 
-    const response = NextResponse.redirect("https://www.ukepenger.no/kids", { status: 303 });
+    const response = NextResponse.redirect("https://ukepenger.no/kids", { status: 303 });
     response.cookies.set({
       name: "uk_kiosk",
       value: `${row.id}:${row.device_secret}`,
@@ -69,6 +69,7 @@ export async function GET(request: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
+      domain: "ukepenger.no",
       maxAge: 31536000,
     });
     return response;
