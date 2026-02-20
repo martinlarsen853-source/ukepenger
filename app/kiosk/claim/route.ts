@@ -59,7 +59,6 @@ export async function GET(request: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      domain: "ukepenger.no",
       maxAge: 31536000,
     });
     response.cookies.set({
@@ -69,7 +68,6 @@ export async function GET(request: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      domain: "ukepenger.no",
       maxAge: 0,
     });
     return response;
