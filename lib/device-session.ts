@@ -76,9 +76,20 @@ export type KioskCookieSession = {
 
 export function parseKioskCookieValue(value: string | undefined | null): KioskCookieSession | null {
   if (!value) return null;
-  const [deviceId, deviceSecret] = value.split(":");
+  const raw = value.trim();
+  if (!raw) return null;
+
+  // NextResponse cookie serialization percent-encodes ":" as "%3A", so decode before parsing.
+  let decoded = raw;
+  try {
+    decoded = decodeURIComponent(raw);
+  } catch {
+    decoded = raw;
+  }
+
+  const [deviceId, deviceSecret] = decoded.split(":");
   if (!deviceId || !deviceSecret) return null;
-  return { deviceId, deviceSecret };
+  return { deviceId: deviceId.trim(), deviceSecret: deviceSecret.trim() };
 }
 
 export function getKioskSessionFromRequest(request: Request) {
