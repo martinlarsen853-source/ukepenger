@@ -4,10 +4,6 @@ import { getServiceSupabaseClient } from "@/lib/server-supabase";
 
 export const runtime = "nodejs";
 
-function redirectKiosk(error: string) {
-  return NextResponse.redirect(`https://www.ukepenger.no/kiosk?claim_error=${encodeURIComponent(error)}`, { status: 303 });
-}
-
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
@@ -15,12 +11,12 @@ export async function GET(request: Request) {
     const secret = (url.searchParams.get("secret") ?? "").trim();
 
     if (!code || !secret) {
-      return redirectKiosk("missing_params");
+      return NextResponse.redirect(`${url.origin}/kiosk?claim_error=missing_params`, { status: 303 });
     }
 
     const supabase = getServiceSupabaseClient();
     if (!supabase) {
-      return redirectKiosk("server_error");
+      return NextResponse.redirect(`${url.origin}/kiosk?claim_error=server_error`, { status: 303 });
     }
 
     const result = await supabase
@@ -34,7 +30,7 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (result.error || !result.data) {
-      return redirectKiosk("invalid_device");
+      return NextResponse.redirect(`${url.origin}/kiosk?claim_error=invalid_device`, { status: 303 });
     }
 
     const row = result.data as {
@@ -44,14 +40,14 @@ export async function GET(request: Request) {
       revoked_at: string | null;
     };
     if (!row.active || row.revoked_at || !row.device_secret) {
-      return redirectKiosk("invalid_device");
+      return NextResponse.redirect(`${url.origin}/kiosk?claim_error=invalid_device`, { status: 303 });
     }
 
     if (row.device_secret !== secret) {
-      return redirectKiosk("invalid_secret");
+      return NextResponse.redirect(`${url.origin}/kiosk?claim_error=invalid_secret`, { status: 303 });
     }
 
-    const response = NextResponse.redirect("https://www.ukepenger.no/kids", { status: 303 });
+    const response = NextResponse.redirect(`${url.origin}/kids`, { status: 303 });
     response.cookies.set({
       name: "uk_kiosk",
       value: getKioskCookieValue(row.id, row.device_secret),
@@ -61,17 +57,8 @@ export async function GET(request: Request) {
       path: "/",
       maxAge: 31536000,
     });
-    response.cookies.set({
-      name: "uk_kid",
-      value: "",
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0,
-    });
     return response;
   } catch {
-    return redirectKiosk("server_error");
+    return NextResponse.redirect(`${new URL(request.url).origin}/kiosk?claim_error=server_error`, { status: 303 });
   }
 }
