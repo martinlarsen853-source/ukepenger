@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getAvatarByKey } from "@/lib/avatars";
 
@@ -22,10 +21,9 @@ const cardColors = [
 ];
 
 export default function KidsPage() {
-  const router = useRouter();
   const [children, setChildren] = useState<ChildRow[]>([]);
   const [status, setStatus] = useState("Laster...");
-  const [showLoginLink, setShowLoginLink] = useState(false);
+  const [showKioskLink, setShowKioskLink] = useState(false);
 
   useEffect(() => {
     const run = async () => {
@@ -33,26 +31,21 @@ export default function KidsPage() {
         method: "GET",
         credentials: "include",
       });
-      const payload = (await res.json()) as { error?: string; children?: ChildRow[]; selectedChildId?: string | null };
+      const payload = (await res.json()) as { error?: string; children?: ChildRow[] };
 
       if (!res.ok || payload.error) {
-        setStatus(payload.error ?? "Denne enheten er ikke koblet til en familie.");
-        setShowLoginLink(true);
-        return;
-      }
-
-      if (payload.selectedChildId) {
-        router.replace(`/kids/${payload.selectedChildId}`);
+        setStatus(payload.error ?? "Kiosk-session mangler eller er ugyldig.");
+        setShowKioskLink(true);
         return;
       }
 
       setChildren(payload.children ?? []);
       setStatus("");
-      setShowLoginLink(false);
+      setShowKioskLink(false);
     };
 
     void run();
-  }, [router]);
+  }, []);
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 md:px-8 md:py-10">
@@ -63,9 +56,9 @@ export default function KidsPage() {
         {status && (
           <div className="mb-6 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-300">
             <div>{status}</div>
-            {showLoginLink && (
-              <Link href="/login" className="mt-2 inline-flex text-slate-100 underline underline-offset-4">
-                Gaa til login
+            {showKioskLink && (
+              <Link href="/kiosk" className="mt-2 inline-flex text-slate-100 underline underline-offset-4">
+                Gaa til kiosk
               </Link>
             )}
           </div>

@@ -9,16 +9,6 @@ type ChildRow = {
   color?: string | null;
 };
 
-function getCookieValue(request: Request, name: string) {
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  const part = cookieHeader
-    .split(";")
-    .map((item) => item.trim())
-    .find((item) => item.startsWith(`${name}=`));
-  if (!part) return null;
-  return decodeURIComponent(part.slice(name.length + 1));
-}
-
 export async function GET(request: Request) {
   const auth = await verifyKioskRequest(request);
   if (!auth) {
@@ -41,20 +31,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: childrenRes.error.message }, { status: 400 });
   }
 
-  let selectedChildId: string | null = null;
-  const kidCookie = getCookieValue(request, "uk_kid");
-  if (kidCookie) {
-    const kidRes = await supabase
-      .from("children")
-      .select("id, family_id, active")
-      .eq("id", kidCookie)
-      .maybeSingle();
-
-    if (!kidRes.error && kidRes.data && kidRes.data.family_id === auth.familyId && kidRes.data.active) {
-      selectedChildId = kidRes.data.id as string;
-    }
-  }
-
   const children = ((childrenRes.data ?? []) as ChildRow[]).map((child) => ({ ...child, color: null }));
-  return NextResponse.json({ children, selectedChildId });
+  return NextResponse.json({ children });
 }
