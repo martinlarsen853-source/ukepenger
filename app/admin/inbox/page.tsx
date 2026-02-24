@@ -15,6 +15,16 @@ type ClaimRow = {
   tasks: { title: string }[] | null;
 };
 
+type ChildRow = {
+  id: string;
+  name: string;
+};
+
+type TaskRow = {
+  id: string;
+  title: string;
+};
+
 function formatKr(ore: number) {
   return `${(ore / 100).toFixed(2)} kr`;
 }
@@ -25,24 +35,48 @@ export default function AdminInboxPage() {
   const [loading, setLoading] = useState(true);
   const [familyId, setFamilyId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [childMap, setChildMap] = useState<Record<string, string>>({});
+  const [taskMap, setTaskMap] = useState<Record<string, string>>({});
 
   const load = useCallback(async (nextFamilyId?: string) => {
     const family = nextFamilyId ?? familyId;
     if (!family) return;
 
-    const res = await supabase
-      .from("claims")
-      .select("id, created_at, amount_ore, child_id, task_id, children(name), tasks(title)")
-      .eq("family_id", family)
-      .eq("status", "SENT")
-      .order("created_at", { ascending: false });
+    const [claimsRes, childrenRes, tasksRes] = await Promise.all([
+      supabase
+        .from("claims")
+        .select("id, created_at, amount_ore, child_id, task_id, children(name), tasks(title)")
+        .eq("family_id", family)
+        .eq("status", "SENT")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("children")
+        .select("id, name")
+        .eq("family_id", family)
+        .eq("active", true)
+        .order("name", { ascending: true }),
+      supabase
+        .from("tasks")
+        .select("id, title")
+        .eq("family_id", family)
+        .eq("active", true)
+        .order("title", { ascending: true }),
+    ]);
 
-    if (res.error) {
-      setStatus(`Feil: ${res.error.message}`);
+    if (claimsRes.error || childrenRes.error || tasksRes.error) {
+      setStatus(`Feil: ${claimsRes.error?.message ?? childrenRes.error?.message ?? tasksRes.error?.message}`);
       return;
     }
 
-    setItems((res.data ?? []) as ClaimRow[]);
+    const nextChildMap: Record<string, string> = {};
+    for (const child of (childrenRes.data ?? []) as ChildRow[]) nextChildMap[child.id] = child.name;
+    setChildMap(nextChildMap);
+
+    const nextTaskMap: Record<string, string> = {};
+    for (const task of (tasksRes.data ?? []) as TaskRow[]) nextTaskMap[task.id] = task.title;
+    setTaskMap(nextTaskMap);
+
+    setItems((claimsRes.data ?? []) as ClaimRow[]);
   }, [familyId]);
 
   useEffect(() => {
@@ -124,8 +158,8 @@ export default function AdminInboxPage() {
           <tbody>
             {items.map((item) => (
               <tr key={item.id} className="border-t border-slate-800 text-slate-100">
-                <td className="px-4 py-3">{item.children?.[0]?.name ?? item.child_id}</td>
-                <td className="px-4 py-3">{item.tasks?.[0]?.title ?? item.task_id}</td>
+                <td className="px-4 py-3">{childMap[item.child_id] ?? item.children?.[0]?.name ?? item.child_id}</td>
+                <td className="px-4 py-3">{taskMap[item.task_id] ?? item.tasks?.[0]?.title ?? item.task_id}</td>
                 <td className="px-4 py-3">{formatKr(item.amount_ore)}</td>
                 <td className="px-4 py-3">{new Date(item.created_at).toLocaleString("nb-NO")}</td>
                 <td className="px-4 py-3">

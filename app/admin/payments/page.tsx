@@ -9,6 +9,11 @@ type ChildRow = {
   name: string;
 };
 
+type TaskRow = {
+  id: string;
+  title: string;
+};
+
 type ApprovedClaimRow = {
   id: string;
   family_id: string;
@@ -65,13 +70,15 @@ export default function AdminPaymentsPage() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [taskMap, setTaskMap] = useState<Record<string, string>>({});
 
   const load = useCallback(async (nextFamilyId?: string) => {
     const family = nextFamilyId ?? familyId;
     if (!family) return;
 
-    const [childrenRes, approvedRes, paymentsRes] = await Promise.all([
+    const [childrenRes, tasksRes, approvedRes, paymentsRes] = await Promise.all([
       supabase.from("children").select("id, name").eq("family_id", family).eq("active", true).order("name", { ascending: true }),
+      supabase.from("tasks").select("id, title").eq("family_id", family).eq("active", true).order("title", { ascending: true }),
       supabase
         .from("claims")
         .select("id, family_id, child_id, task_id, amount_ore, created_at, children(name), tasks(title)")
@@ -85,17 +92,24 @@ export default function AdminPaymentsPage() {
         .order("created_at", { ascending: false }),
     ]);
 
-    if (childrenRes.error || approvedRes.error || paymentsRes.error) {
-      setStatus(`Feil: ${childrenRes.error?.message ?? approvedRes.error?.message ?? paymentsRes.error?.message}`);
+    if (childrenRes.error || tasksRes.error || approvedRes.error || paymentsRes.error) {
+      setStatus(
+        `Feil: ${childrenRes.error?.message ?? tasksRes.error?.message ?? approvedRes.error?.message ?? paymentsRes.error?.message}`
+      );
       return;
     }
 
     const childRows = (childrenRes.data ?? []) as ChildRow[];
+    const taskRows = (tasksRes.data ?? []) as TaskRow[];
     const approvedClaims = (approvedRes.data ?? []) as ApprovedClaimRow[];
     const paymentRows = (paymentsRes.data ?? []) as PaymentRow[];
 
     setChildren(childRows);
     if (!selectedChildId && childRows.length > 0) setSelectedChildId(childRows[0].id);
+
+    const nextTaskMap: Record<string, string> = {};
+    for (const task of taskRows) nextTaskMap[task.id] = task.title;
+    setTaskMap(nextTaskMap);
 
     const approvedIds = approvedClaims.map((claim) => claim.id);
     let linkedClaimIds = new Set<string>();
@@ -133,18 +147,18 @@ export default function AdminPaymentsPage() {
         historyClaimsMap[row.payment_id].push({
           id: claim.id,
           amount_ore: claim.amount_ore,
-          title: claim.tasks?.[0]?.title ?? claim.task_id,
+          title: nextTaskMap[claim.task_id] ?? claim.tasks?.[0]?.title ?? claim.task_id,
         });
       }
     }
 
-    const childMap: Record<string, string> = {};
-    for (const child of childRows) childMap[child.id] = child.name;
+    const childNameMap: Record<string, string> = {};
+    for (const child of childRows) childNameMap[child.id] = child.name;
 
     setPaymentHistory(
       paymentRows.map((payment) => ({
         payment,
-        childName: childMap[payment.child_id] ?? payment.child_id,
+        childName: childNameMap[payment.child_id] ?? payment.child_id,
         claims: historyClaimsMap[payment.id] ?? [],
       }))
     );
@@ -171,6 +185,12 @@ export default function AdminPaymentsPage() {
     () => claims.filter((claim) => !selectedChildId || claim.child_id === selectedChildId),
     [claims, selectedChildId]
   );
+
+  const childMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const child of children) map[child.id] = child.name;
+    return map;
+  }, [children]);
 
   const selectedIds = useMemo(
     () => visibleClaims.filter((claim) => selectedClaimIds[claim.id]).map((claim) => claim.id),
@@ -313,8 +333,8 @@ export default function AdminPaymentsPage() {
                     className="h-4 w-4 cursor-pointer"
                   />
                 </td>
-                <td className="px-4 py-3">{claim.children?.[0]?.name ?? claim.child_id}</td>
-                <td className="px-4 py-3">{claim.tasks?.[0]?.title ?? claim.task_id}</td>
+                <td className="px-4 py-3">{childMap[claim.child_id] ?? claim.children?.[0]?.name ?? claim.child_id}</td>
+                <td className="px-4 py-3">{taskMap[claim.task_id] ?? claim.tasks?.[0]?.title ?? claim.task_id}</td>
                 <td className="px-4 py-3">{formatKr(claim.amount_ore)}</td>
                 <td className="px-4 py-3">{new Date(claim.created_at).toLocaleString("nb-NO")}</td>
               </tr>
