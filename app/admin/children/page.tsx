@@ -37,16 +37,20 @@ export default function AdminChildrenPage() {
   const [avatarKey, setAvatarKey] = useState(DEFAULT_AVATAR_KEY);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showInactive, setShowInactive] = useState(false);
 
   const load = useCallback(async (nextFamilyId?: string) => {
     const id = nextFamilyId ?? familyId;
     if (!id) return;
 
-    const childrenRes = await supabase
+    let childrenQuery = supabase
       .from("children")
       .select("id, name, avatar_key, active")
-      .eq("family_id", id)
-      .order("created_at", { ascending: false });
+      .eq("family_id", id);
+    if (!showInactive) {
+      childrenQuery = childrenQuery.eq("active", true);
+    }
+    const childrenRes = await childrenQuery.order("created_at", { ascending: false });
 
     if (childrenRes.error) {
       setStatus(`Feil: ${childrenRes.error.message}`);
@@ -80,7 +84,7 @@ export default function AdminChildrenPage() {
     }
 
     setStatsByChild(nextStats);
-  }, [familyId]);
+  }, [familyId, showInactive]);
 
   useEffect(() => {
     const run = async () => {
@@ -126,6 +130,12 @@ export default function AdminChildrenPage() {
   };
 
   const toggleActive = async (child: ChildRow) => {
+    if (child.active) {
+      const confirmed = window.confirm(
+        "Fjerne barnet? Barnet settes som inaktivt og forsvinner fra appen. Historikk beholdes."
+      );
+      if (!confirmed) return;
+    }
     setStatus("");
     const res = await supabase.from("children").update({ active: !child.active }).eq("id", child.id);
     if (res.error) {
@@ -149,6 +159,7 @@ export default function AdminChildrenPage() {
 
   const isError = status.startsWith("Feil:");
   const disableCreate = name.trim().length === 0;
+  const visibleChildren = showInactive ? children : children.filter((child) => child.active);
 
   return (
     <section className="space-y-5">
@@ -208,15 +219,24 @@ export default function AdminChildrenPage() {
       )}
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 md:p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold tracking-tight">Oversikt per barn</h3>
-          <span className="text-xs uppercase tracking-wide text-slate-500">Til gode / Utbetalt / Krav</span>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-base font-semibold tracking-tight">Oversikt per barn</h3>
+            <span className="text-xs uppercase tracking-wide text-slate-500">Til gode / Utbetalt / Krav</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowInactive((prev) => !prev)}
+            className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
+          >
+            {showInactive ? "Skjul inaktive" : "Vis inaktive"}
+          </button>
         </div>
-        {children.length === 0 ? (
+        {visibleChildren.length === 0 ? (
           <div className="text-sm text-slate-400">Ingen barn a vise.</div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {children.map((child) => {
+            {visibleChildren.map((child) => {
               const stats = statsByChild[child.id] ?? { dueOre: 0, paidOre: 0, totalCount: 0 };
               const avatar = getAvatarByKey(child.avatar_key);
               return (
@@ -266,7 +286,7 @@ export default function AdminChildrenPage() {
             </tr>
           </thead>
           <tbody>
-            {children.map((child) => (
+            {visibleChildren.map((child) => (
               <tr key={child.id} className="border-t border-slate-800 text-slate-100">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
@@ -303,7 +323,7 @@ export default function AdminChildrenPage() {
                       onClick={() => void toggleActive(child)}
                       className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-200 transition hover:border-slate-500 hover:bg-slate-800"
                     >
-                      {child.active ? "Deaktiver" : "Aktiver"}
+                      {child.active ? "Fjern" : "Gjenopprett"}
                     </button>
                     <Link
                       href={`/admin/children/${child.id}`}
@@ -315,7 +335,7 @@ export default function AdminChildrenPage() {
                 </td>
               </tr>
             ))}
-            {children.length === 0 && (
+            {visibleChildren.length === 0 && (
               <tr>
                 <td className="px-4 py-10 text-center text-slate-400" colSpan={4}>
                   Ingen barn enda. Legg til forste barn over.
