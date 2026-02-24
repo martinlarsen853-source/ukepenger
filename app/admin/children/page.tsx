@@ -74,7 +74,9 @@ export default function AdminChildrenPage() {
       if (!nextStats[claim.child_id]) {
         nextStats[claim.child_id] = { dueOre: 0, paidOre: 0, totalCount: 0 };
       }
-      nextStats[claim.child_id].totalCount += 1;
+      if (claim.status === "SENT") {
+        nextStats[claim.child_id].totalCount += 1;
+      }
       if (claim.status === "APPROVED") {
         nextStats[claim.child_id].dueOre += claim.amount_ore;
       }
