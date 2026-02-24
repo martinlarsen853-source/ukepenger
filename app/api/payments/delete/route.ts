@@ -98,7 +98,7 @@ export async function POST(request: Request) {
   if (claimIds.length > 0) {
     const revertRes = await serviceClient
       .from("claims")
-      .update({ status: "APPROVED", paid_at: null })
+      .update({ status: "REJECTED", paid_at: null })
       .in("id", claimIds);
 
     if (revertRes.error) {
