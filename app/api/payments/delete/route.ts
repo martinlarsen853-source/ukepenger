@@ -51,7 +51,12 @@ export async function POST(request: Request) {
 
   const adminFamilyId = profileRes.data.family_id as string;
 
-  const body = (await request.json()) as { paymentId?: string };
+  let body: { paymentId?: string } = {};
+  try {
+    body = (await request.json()) as { paymentId?: string };
+  } catch {
+    return NextResponse.json({ error: "Ugyldig JSON." }, { status: 400 });
+  }
   const paymentId = body.paymentId?.trim();
 
   if (!paymentId) {
@@ -94,18 +99,37 @@ export async function POST(request: Request) {
     const revertRes = await serviceClient
       .from("claims")
       .update({ status: "APPROVED", paid_at: null })
-      .in("id", claimIds)
-      .eq("status", "PAID");
+      .in("id", claimIds);
 
     if (revertRes.error) {
       return NextResponse.json({ error: revertRes.error.message }, { status: 400 });
     }
   }
 
-  const deleteRes = await serviceClient.from("payments").delete().eq("id", paymentId);
-  if (deleteRes.error) {
-    return NextResponse.json({ error: deleteRes.error.message }, { status: 400 });
+  const deleteLinksRes = await serviceClient
+    .from("payment_claims")
+    .delete()
+    .eq("payment_id", paymentId)
+    .select("claim_id");
+
+  if (deleteLinksRes.error) {
+    return NextResponse.json({ error: deleteLinksRes.error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true, revertedClaims: claimIds.length });
+  const deletePaymentsRes = await serviceClient
+    .from("payments")
+    .delete()
+    .eq("id", paymentId)
+    .select("id");
+
+  if (deletePaymentsRes.error) {
+    return NextResponse.json({ error: deletePaymentsRes.error.message }, { status: 400 });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    revertedClaims: claimIds.length,
+    deletedLinks: (deleteLinksRes.data ?? []).length,
+    deletedPayments: (deletePaymentsRes.data ?? []).length,
+  });
 }

@@ -281,14 +281,14 @@ export default function AdminPaymentsPage() {
       body: JSON.stringify({ paymentId }),
     });
 
-    const payload = (await response.json()) as { error?: string; revertedClaims?: number };
+    const payload = (await response.json().catch(() => ({}))) as { error?: string; revertedClaims?: number };
 
-    if (!response.ok || payload.error) {
-      setStatus(`Feil: ${payload.error ?? "Kunne ikke slette utbetaling."}`);
+    if (!response.ok) {
+      setStatus(`Feil (${response.status}): ${payload.error ?? "Ukjent feil"}`);
       return;
     }
 
-    setStatus(`Utbetaling slettet. Reverterte ${payload.revertedClaims ?? 0} krav.`);
+    setStatus(`Utbetaling slettet. Revert: ${payload.revertedClaims ?? 0}`);
     await load();
   };
 
