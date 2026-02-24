@@ -16,13 +16,19 @@ const navItems = [
   { href: "/admin/settings", label: "Innstillinger" },
 ];
 
+const betaNavItem =
+  process.env.NEXT_PUBLIC_BETA_FAMILY === "true"
+    ? [{ href: "/admin/beta/family", label: "Familie (beta)" }]
+    : [];
+
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
 
-  const currentPageTitle = navItems.find((item) => pathname.startsWith(item.href))?.label ?? "Admin";
+  const fullNav = [...navItems, ...betaNavItem];
+  const currentPageTitle = fullNav.find((item) => pathname.startsWith(item.href))?.label ?? "Admin";
 
   useEffect(() => {
     const run = async () => {
@@ -53,7 +59,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside className="border-b border-slate-800 bg-slate-900 px-4 py-4 md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r md:px-5 md:py-6">
         <h1 className="mb-4 text-lg font-semibold tracking-tight">Admin</h1>
         <nav className="flex gap-2 overflow-x-auto pb-1 md:block md:space-y-1 md:overflow-visible">
-          {navItems.map((item) => (
+          {fullNav.map((item) => (
             <Link
               key={item.href}
               href={item.href}

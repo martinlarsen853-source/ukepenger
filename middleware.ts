@@ -6,6 +6,15 @@ export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const kioskCookie = req.cookies.get(KIOSK_COOKIE_NAME)?.value;
 
+  if (pathname.startsWith("/admin/beta")) {
+    if (process.env.NEXT_PUBLIC_BETA_FAMILY !== "true") {
+      const url = req.nextUrl.clone();
+      url.pathname = "/admin/inbox";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
   if (pathname === "/kiosk" || pathname.startsWith("/kiosk/claim") || pathname.startsWith("/api/kids")) {
     return NextResponse.next();
   }
@@ -55,6 +64,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/kids/:path*", "/kiosk", "/kiosk/claim", "/api/kids/:path*"],
+  matcher: ["/", "/kids/:path*", "/kiosk", "/kiosk/claim", "/api/kids/:path*", "/admin/beta/:path*"],
 };
 
