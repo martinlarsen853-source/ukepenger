@@ -256,6 +256,42 @@ export default function AdminPaymentsPage() {
     await load();
   };
 
+  const deletePayment = async (paymentId: string) => {
+    const confirmed = window.confirm(
+      "Er du sikker pa at du vil slette denne utbetalingen? Kravene blir satt tilbake til APPROVED."
+    );
+    if (!confirmed) return;
+
+    setStatus("");
+
+    const sessionRes = await supabase.auth.getSession();
+    const accessToken = sessionRes.data.session?.access_token;
+
+    if (!accessToken) {
+      setStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      return;
+    }
+
+    const response = await fetch("/api/payments/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ paymentId }),
+    });
+
+    const payload = (await response.json()) as { error?: string; revertedClaims?: number };
+
+    if (!response.ok || payload.error) {
+      setStatus(`Feil: ${payload.error ?? "Kunne ikke slette utbetaling."}`);
+      return;
+    }
+
+    setStatus(`Utbetaling slettet. Reverterte ${payload.revertedClaims ?? 0} krav.`);
+    await load();
+  };
+
   if (loading) return <div className="text-slate-300">Laster...</div>;
 
   const isError = status.startsWith("Feil:");
@@ -406,6 +442,15 @@ export default function AdminPaymentsPage() {
                       <span className="font-semibold">{formatKr(claim.amount_ore)}</span>
                     </div>
                   ))}
+                </div>
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => void deletePayment(entry.payment.id)}
+                    className="rounded-lg border border-red-800 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-red-200 transition hover:border-red-700 hover:bg-red-950/40"
+                  >
+                    Slett
+                  </button>
                 </div>
               </article>
             ))}
