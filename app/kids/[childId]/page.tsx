@@ -42,6 +42,9 @@ export default function KidTaskPage() {
   const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
   const [confirmations, setConfirmations] = useState<Record<string, number>>({});
   const [nowTs, setNowTs] = useState<number>(() => Date.now());
+  const [pendingOre, setPendingOre] = useState(0);
+  const [approvedOre, setApprovedOre] = useState(0);
+  const [totalOre, setTotalOre] = useState(0);
 
   useEffect(() => {
     const run = async () => {
@@ -54,6 +57,9 @@ export default function KidTaskPage() {
         child?: ChildRow;
         tasks?: TaskRow[];
         cooldowns?: Record<string, number>;
+        pending_ore?: number;
+        approved_ore?: number;
+        total_ore?: number;
       };
 
       if (!res.ok || payload.error || !payload.child) {
@@ -65,6 +71,9 @@ export default function KidTaskPage() {
       setChild(payload.child);
       setTasks(payload.tasks ?? []);
       setCooldowns(payload.cooldowns ?? {});
+      setPendingOre(payload.pending_ore ?? 0);
+      setApprovedOre(payload.approved_ore ?? 0);
+      setTotalOre(payload.total_ore ?? 0);
       setShowLoginLink(false);
       setStatus("");
     };
@@ -98,9 +107,17 @@ export default function KidTaskPage() {
   }, []);
 
   const submitClaim = async (taskId: string) => {
+    const task = tasks.find((entry) => entry.id === taskId);
+    if (!task) {
+      setStatus("Feil: Fant ikke oppgaven.");
+      return;
+    }
+
     setStatus("");
     const currentTs = nowTs;
     setCooldowns((prev) => ({ ...prev, [taskId]: currentTs + 10_000 }));
+    setPendingOre((prev) => prev + task.amount_ore);
+    setTotalOre((prev) => prev + task.amount_ore);
 
     const res = await fetch("/api/kids/claim", {
       method: "POST",
@@ -111,12 +128,16 @@ export default function KidTaskPage() {
 
     const payload = (await res.json()) as { error?: string; ok?: boolean; status?: string };
     if (!res.ok || payload.error) {
+      setPendingOre((prev) => prev - task.amount_ore);
+      setTotalOre((prev) => prev - task.amount_ore);
       setStatus(`Feil: ${payload.error ?? "Kunne ikke sende krav."}`);
       return;
     }
 
     setConfirmations((prev) => ({ ...prev, [taskId]: nowTs + 2_500 }));
     if (payload.status === "APPROVED") {
+      setPendingOre((prev) => Math.max(0, prev - task.amount_ore));
+      setApprovedOre((prev) => prev + task.amount_ore);
       setStatus("Sendt! Kravet ble auto-godkjent.");
       return;
     }
@@ -146,7 +167,12 @@ export default function KidTaskPage() {
           </div>
 
           <div className="rounded-xl border border-slate-800 bg-slate-950 p-3 text-sm text-slate-300">
-            Min saldo / opptjent: <span className="font-semibold text-slate-100">Kommer snart</span>
+            <div>
+              Saldo totalt: <span className="font-semibold text-slate-100">{formatKr(totalOre)}</span>
+            </div>
+            <div className="mt-1 text-xs text-slate-400">
+              Venter: {formatKr(pendingOre)} &bull; Til gode: {formatKr(approvedOre)}
+            </div>
           </div>
         </div>
 

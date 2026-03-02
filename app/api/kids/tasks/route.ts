@@ -27,6 +27,11 @@ type ClaimRow = {
   created_at: string;
 };
 
+type BalanceClaimRow = {
+  amount_ore: number;
+  status: "SENT" | "APPROVED";
+};
+
 export async function GET(request: Request) {
   const auth = await verifyKioskRequest(request);
   if (!auth) {
@@ -62,7 +67,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Ingen tilgang til barnet." }, { status: 403 });
   }
 
-  const [tasksRes, settingsRes, recentClaimsRes] = await Promise.all([
+  const [tasksRes, settingsRes, recentClaimsRes, balanceClaimsRes] = await Promise.all([
     supabase
       .from("tasks")
       .select("id, title, amount_ore, active")
@@ -75,11 +80,19 @@ export async function GET(request: Request) {
       .select("task_id, created_at")
       .eq("child_id", childId)
       .gte("created_at", new Date(Date.now() - 10_000).toISOString()),
+    supabase.from("claims").select("amount_ore, status").eq("child_id", childId).in("status", ["SENT", "APPROVED"]),
   ]);
 
-  if (tasksRes.error || settingsRes.error || recentClaimsRes.error) {
+  if (tasksRes.error || settingsRes.error || recentClaimsRes.error || balanceClaimsRes.error) {
     return NextResponse.json(
-      { error: tasksRes.error?.message ?? settingsRes.error?.message ?? recentClaimsRes.error?.message ?? "Ukjent feil." },
+      {
+        error:
+          tasksRes.error?.message ??
+          settingsRes.error?.message ??
+          recentClaimsRes.error?.message ??
+          balanceClaimsRes.error?.message ??
+          "Ukjent feil.",
+      },
       { status: 400 }
     );
   }
@@ -96,9 +109,20 @@ export async function GET(request: Request) {
     cooldowns[claim.task_id] = Math.max(cooldowns[claim.task_id] ?? 0, cooldownUntil);
   }
 
+  let pending_ore = 0;
+  let approved_ore = 0;
+  for (const claim of (balanceClaimsRes.data ?? []) as BalanceClaimRow[]) {
+    if (claim.status === "SENT") pending_ore += claim.amount_ore;
+    if (claim.status === "APPROVED") approved_ore += claim.amount_ore;
+  }
+  const total_ore = pending_ore + approved_ore;
+
   return NextResponse.json({
     child: { id: child.id, name: child.name, avatar_key: child.avatar_key },
     tasks: visibleTasks,
     cooldowns,
+    pending_ore,
+    approved_ore,
+    total_ore,
   });
 }
