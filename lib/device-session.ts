@@ -116,26 +116,20 @@ export function clearDeviceSessionCookie() {
 
 export async function generateDeviceToken() {
   const bytes = new Uint8Array(32);
-  if (globalThis.crypto?.getRandomValues) {
-    globalThis.crypto.getRandomValues(bytes);
-  } else {
-    const { randomBytes } = await import("crypto");
-    const buffer = randomBytes(32);
-    bytes.set(buffer);
+  if (!globalThis.crypto?.getRandomValues) {
+    throw new Error("Crypto API is not available in this runtime.");
   }
+  globalThis.crypto.getRandomValues(bytes);
   return bytesToBase64Url(bytes);
 }
 
 export async function generateDeviceCode(length = 8) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const bytes = new Uint8Array(length);
-  if (globalThis.crypto?.getRandomValues) {
-    globalThis.crypto.getRandomValues(bytes);
-  } else {
-    const { randomBytes } = await import("crypto");
-    const buffer = randomBytes(length);
-    bytes.set(buffer);
+  if (!globalThis.crypto?.getRandomValues) {
+    throw new Error("Crypto API is not available in this runtime.");
   }
+  globalThis.crypto.getRandomValues(bytes);
   return Array.from(bytes)
     .map((byte) => chars[byte % chars.length])
     .join("");
@@ -143,22 +137,18 @@ export async function generateDeviceCode(length = 8) {
 
 export async function generateDeviceSecret(length = 48) {
   const bytes = new Uint8Array(length);
-  if (globalThis.crypto?.getRandomValues) {
-    globalThis.crypto.getRandomValues(bytes);
-  } else {
-    const { randomBytes } = await import("crypto");
-    const buffer = randomBytes(length);
-    bytes.set(buffer);
+  if (!globalThis.crypto?.getRandomValues) {
+    throw new Error("Crypto API is not available in this runtime.");
   }
+  globalThis.crypto.getRandomValues(bytes);
   return bytesToBase64Url(bytes);
 }
 
 export async function hashToken(token: string) {
   const data = new TextEncoder().encode(token);
-  if (globalThis.crypto?.subtle) {
-    const digest = await globalThis.crypto.subtle.digest("SHA-256", data);
-    return bytesToBase64Url(new Uint8Array(digest));
+  if (!globalThis.crypto?.subtle) {
+    throw new Error("Crypto subtle API is not available in this runtime.");
   }
-  const { createHash } = await import("crypto");
-  return createHash("sha256").update(data).digest("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", data);
+  return bytesToBase64Url(new Uint8Array(digest));
 }
