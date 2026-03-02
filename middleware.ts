@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { KIOSK_COOKIE_NAME } from "@/lib/device-session";
+import { KIOSK_COOKIE_NAME } from "@/lib/device-session.edge";
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;

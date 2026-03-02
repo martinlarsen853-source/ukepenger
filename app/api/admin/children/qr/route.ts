@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { generateDeviceCode, generateDeviceSecret, hashToken } from "@/lib/device-session";
+import { generateDeviceCode, generateDeviceSecret, hashToken } from "@/lib/device-session.node";
 
 export const runtime = "nodejs";
 

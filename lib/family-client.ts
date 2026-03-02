@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { getDeviceSessionFromDocument } from "@/lib/device-session";
+import { getDeviceSessionFromDocument } from "@/lib/device-session.shared";
 import { supabase } from "@/lib/supabaseClient";
 
 export type ApprovalMode = "REQUIRE_APPROVAL" | "AUTO_APPROVE";
