@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { KIOSK_COOKIE_NAME } from "@/lib/device-session.edge";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
   const kioskCookie = req.cookies.get(KIOSK_COOKIE_NAME)?.value;
 
@@ -66,4 +66,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/", "/kids/:path*", "/kiosk", "/kiosk/claim", "/api/kids/:path*", "/admin/beta/:path*"],
 };
-
