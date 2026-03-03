@@ -201,6 +201,14 @@ export default function AdminPaymentsPage() {
     () => visibleClaims.filter((claim) => selectedClaimIds[claim.id]).reduce((sum, claim) => sum + claim.amount_ore, 0),
     [visibleClaims, selectedClaimIds]
   );
+  const allTotal = useMemo(
+    () => visibleClaims.reduce((sum, claim) => sum + (claim.amount_ore ?? 0), 0),
+    [visibleClaims]
+  );
+  const selectedChildName = useMemo(
+    () => children.find((child) => child.id === selectedChildId)?.name ?? "valgt barn",
+    [children, selectedChildId]
+  );
 
   const toggleClaim = (claimId: string) => {
     setSelectedClaimIds((prev) => ({ ...prev, [claimId]: !prev[claimId] }));
@@ -267,6 +275,13 @@ export default function AdminPaymentsPage() {
       setStatus("Ingen til gode å utbetale.");
       return;
     }
+    if (!allTotal) {
+      setStatus("Ingen til gode å utbetale.");
+      return;
+    }
+    if (!window.confirm(`Er du sikker pa at du vil utbetale ${formatKr(allTotal)} til ${selectedChildName}?`)) {
+      return;
+    }
 
     setSubmitting(true);
     setStatus("");
@@ -302,7 +317,7 @@ export default function AdminPaymentsPage() {
       return;
     }
 
-    const totalOre = payload.amount_ore ?? visibleClaims.reduce((sum, claim) => sum + claim.amount_ore, 0);
+    const totalOre = payload.amount_ore ?? allTotal;
     setStatus(`Utbetalte alt til gode (${payload.paymentId}). Sum ${formatKr(totalOre)}.`);
     setNote("");
     setSelectedClaimIds({});
@@ -439,25 +454,25 @@ export default function AdminPaymentsPage() {
         </table>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:gap-4">
         <p className="text-sm text-slate-200">
           Valgt: {selectedIds.length} krav. Sum: <strong>{formatKr(selectedTotal)}</strong>
         </p>
         <button
           type="button"
-          disabled={submitting || selectedIds.length === 0}
-          onClick={() => void markPaid()}
-          className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={submitting || !selectedChildId || allTotal === 0}
+          onClick={() => void payAllForSelectedChild()}
+          className="w-full rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
         >
-          {submitting ? "Lagrer..." : "Marker utbetalt"}
+          {submitting ? "Lagrer..." : allTotal === 0 ? "Ingen til gode" : `Utbetal alt (${formatKr(allTotal)})`}
         </button>
         <button
           type="button"
-          disabled={submitting || !selectedChildId || visibleClaims.length === 0}
-          onClick={() => void payAllForSelectedChild()}
-          className="rounded-lg border border-slate-500 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-300 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={submitting || selectedIds.length === 0}
+          onClick={() => void markPaid()}
+          className="w-full rounded-lg border border-slate-500 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-300 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
         >
-          {submitting ? "Lagrer..." : "Utbetal alt til gode"}
+          {submitting ? "Lagrer..." : "Marker utbetalt"}
         </button>
       </div>
 
