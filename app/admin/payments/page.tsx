@@ -53,9 +53,9 @@ type PaymentHistory = {
 };
 
 type PaymentMethod = "VIPPS" | "CASH" | "BANK" | "OTHER";
-const methodLabelMap: Record<PaymentMethod, string> = {
+const methodLabelMap: Record<string, string> = {
   VIPPS: "Vipps",
-  CASH: "Kontant",
+  CASH: "Kontanter",
   BANK: "Bank",
   OTHER: "Annet",
 };
@@ -71,7 +71,7 @@ export default function AdminPaymentsPage() {
   const [claims, setClaims] = useState<ApprovedClaimRow[]>([]);
   const [selectedClaimIds, setSelectedClaimIds] = useState<Record<string, boolean>>({});
   const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
-  const [method, setMethod] = useState<PaymentMethod>("VIPPS");
+  const [method, setMethod] = useState<PaymentMethod>("CASH");
   const [note, setNote] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
@@ -402,10 +402,10 @@ export default function AdminPaymentsPage() {
               value={method}
               onChange={(e) => setMethod(e.target.value as PaymentMethod)}
             >
-              <option value="VIPPS">VIPPS</option>
-              <option value="CASH">CASH</option>
-              <option value="BANK">BANK</option>
-              <option value="OTHER">OTHER</option>
+              <option value="VIPPS">Vipps</option>
+              <option value="CASH">Kontanter</option>
+              <option value="BANK">Bank</option>
+              <option value="OTHER">Annet</option>
             </select>
           </label>
 
