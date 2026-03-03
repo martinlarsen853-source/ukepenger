@@ -41,45 +41,6 @@ export async function ensureFamilyForUser(user: { id: string; email?: string | n
   const existing = await getFamilyIdForUser(user.id);
   if (existing.familyId) return { familyId: existing.familyId, error: null };
 
-  if (user.email) {
-    const inviteRes = await supabase
-      .from("family_invites")
-      .select("id, family_id")
-      .eq("email", user.email)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (inviteRes.error) {
-      return { familyId: null, error: inviteRes.error.message };
-    }
-
-    if (inviteRes.data?.family_id) {
-      const profileInsert = await supabase.from("profiles").insert({
-        user_id: user.id,
-        family_id: inviteRes.data.family_id as string,
-        role: "ADMIN",
-      });
-
-      if (profileInsert.error) {
-        const retry = await getFamilyIdForUser(user.id);
-        if (retry.familyId) return { familyId: retry.familyId, error: null };
-        return { familyId: null, error: profileInsert.error.message };
-      }
-
-      const acceptInvite = await supabase
-        .from("family_invites")
-        .update({ accepted_at: new Date().toISOString() })
-        .eq("id", inviteRes.data.id as string);
-
-      if (acceptInvite.error) {
-        return { familyId: null, error: acceptInvite.error.message };
-      }
-
-      return { familyId: inviteRes.data.family_id as string, error: null };
-    }
-  }
-
   const familyNameSeed = user.email?.split("@")[0]?.trim();
   const familyName = familyNameSeed ? `${familyNameSeed} sin familie` : "Min familie";
 
