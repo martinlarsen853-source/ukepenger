@@ -117,6 +117,9 @@ export default function AdminInboxPage() {
     await load();
   };
 
+  const getChildName = (item: ClaimRow) => childMap[item.child_id] ?? item.children?.[0]?.name ?? "Ukjent barn";
+  const getTaskTitle = (item: ClaimRow) => taskMap[item.task_id] ?? item.tasks?.[0]?.title ?? "Ukjent oppgave";
+
   if (loading) return <div className="text-slate-300">Laster...</div>;
   const isError = status.startsWith("Feil:");
 
@@ -144,53 +147,85 @@ export default function AdminInboxPage() {
         </p>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-slate-800/70 text-slate-300">
-            <tr>
-              <th className="px-4 py-3">Barn</th>
-              <th className="px-4 py-3">Oppgave</th>
-              <th className="px-4 py-3">Belop</th>
-              <th className="px-4 py-3">Tid</th>
-              <th className="px-4 py-3">Handling</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-t border-slate-800 text-slate-100">
-                <td className="px-4 py-3">{childMap[item.child_id] ?? item.children?.[0]?.name ?? item.child_id}</td>
-                <td className="px-4 py-3">{taskMap[item.task_id] ?? item.tasks?.[0]?.title ?? item.task_id}</td>
-                <td className="px-4 py-3">{formatKr(item.amount_ore)}</td>
-                <td className="px-4 py-3">{new Date(item.created_at).toLocaleString("nb-NO")}</td>
-                <td className="px-4 py-3">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => void decide(item.id, "APPROVED")}
-                      className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-white"
-                    >
-                      Godkjenn
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void decide(item.id, "REJECTED")}
-                      className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-red-500"
-                    >
-                      Avvis
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {items.length === 0 && (
+      <div className="md:hidden space-y-3">
+        {items.length === 0 && <p className="rounded-xl border border-slate-200 bg-white p-4 text-slate-700">Ingen krav til godkjenning.</p>}
+        {items.map((item) => (
+          <div key={item.id} className="rounded-xl border border-slate-200 bg-white p-4 text-slate-900">
+            <div className="space-y-1 text-sm">
+              <p><span className="font-semibold">Barn:</span> {getChildName(item)}</p>
+              <p><span className="font-semibold">Oppgave:</span> {getTaskTitle(item)}</p>
+              <p><span className="font-semibold">Belop:</span> {formatKr(item.amount_ore)}</p>
+              <p><span className="font-semibold">Tid:</span> {new Date(item.created_at).toLocaleString("nb-NO")}</p>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => void decide(item.id, "APPROVED")}
+                className="w-full rounded-lg bg-slate-900 px-3 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+              >
+                Godkjenn
+              </button>
+              <button
+                type="button"
+                onClick={() => void decide(item.id, "REJECTED")}
+                className="w-full rounded-lg bg-red-600 px-3 py-3 text-sm font-semibold text-white transition hover:bg-red-500"
+              >
+                Avvis
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden md:block">
+        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-slate-800/70 text-slate-300">
               <tr>
-                <td className="px-4 py-10 text-center text-slate-400" colSpan={5}>
-                  Ingen ventende krav akkurat na.
-                </td>
+                <th className="px-4 py-3">Barn</th>
+                <th className="px-4 py-3">Oppgave</th>
+                <th className="px-4 py-3">Belop</th>
+                <th className="px-4 py-3">Tid</th>
+                <th className="px-4 py-3">Handling</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr key={item.id} className="border-t border-slate-800 text-slate-100">
+                  <td className="px-4 py-3">{getChildName(item)}</td>
+                  <td className="px-4 py-3">{getTaskTitle(item)}</td>
+                  <td className="px-4 py-3">{formatKr(item.amount_ore)}</td>
+                  <td className="px-4 py-3">{new Date(item.created_at).toLocaleString("nb-NO")}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => void decide(item.id, "APPROVED")}
+                        className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-white"
+                      >
+                        Godkjenn
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void decide(item.id, "REJECTED")}
+                        className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-red-500"
+                      >
+                        Avvis
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {items.length === 0 && (
+                <tr>
+                  <td className="px-4 py-10 text-center text-slate-400" colSpan={5}>
+                    Ingen krav til godkjenning.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
