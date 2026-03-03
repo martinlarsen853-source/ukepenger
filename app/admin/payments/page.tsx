@@ -256,6 +256,59 @@ export default function AdminPaymentsPage() {
     await load();
   };
 
+  const payAllForSelectedChild = async () => {
+    if (!selectedChildId) {
+      setStatus("Velg barn.");
+      return;
+    }
+
+    const claimIds = visibleClaims.map((claim) => claim.id);
+    if (claimIds.length === 0) {
+      setStatus("Ingen til gode å utbetale.");
+      return;
+    }
+
+    setSubmitting(true);
+    setStatus("");
+
+    const sessionRes = await supabase.auth.getSession();
+    const accessToken = sessionRes.data.session?.access_token;
+
+    if (!accessToken) {
+      setSubmitting(false);
+      setStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      return;
+    }
+
+    const response = await fetch("/api/payments/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        childId: selectedChildId,
+        claimIds,
+        method,
+        note: note.trim() || undefined,
+      }),
+    });
+
+    const payload = (await response.json()) as { error?: string; paymentId?: string; amount_ore?: number };
+    setSubmitting(false);
+
+    if (!response.ok || payload.error) {
+      setStatus(`Feil: ${payload.error ?? "Kunne ikke registrere utbetaling."}`);
+      return;
+    }
+
+    const totalOre = payload.amount_ore ?? visibleClaims.reduce((sum, claim) => sum + claim.amount_ore, 0);
+    setStatus(`Utbetalte alt til gode (${payload.paymentId}). Sum ${formatKr(totalOre)}.`);
+    setNote("");
+    setSelectedClaimIds({});
+    await load();
+  };
+
   const deletePayment = async (paymentId: string) => {
     const confirmed = window.confirm(
       "Er du sikker pa at du vil slette denne utbetalingen? Kravene blir satt tilbake til APPROVED."
@@ -397,6 +450,14 @@ export default function AdminPaymentsPage() {
           className="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? "Lagrer..." : "Marker utbetalt"}
+        </button>
+        <button
+          type="button"
+          disabled={submitting || !selectedChildId || visibleClaims.length === 0}
+          onClick={() => void payAllForSelectedChild()}
+          className="rounded-lg border border-slate-500 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-300 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {submitting ? "Lagrer..." : "Utbetal alt til gode"}
         </button>
       </div>
 
