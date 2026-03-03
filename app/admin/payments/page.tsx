@@ -53,6 +53,12 @@ type PaymentHistory = {
 };
 
 type PaymentMethod = "VIPPS" | "CASH" | "BANK" | "OTHER";
+const methodLabelMap: Record<PaymentMethod, string> = {
+  VIPPS: "Vipps",
+  CASH: "Kontant",
+  BANK: "Bank",
+  OTHER: "Annet",
+};
 
 function formatKr(ore: number) {
   return `${(ore / 100).toFixed(2)} kr`;
@@ -499,38 +505,78 @@ export default function AdminPaymentsPage() {
             Ingen utbetalinger registrert enda.
           </div>
         ) : (
-          <div className="space-y-3">
-            {paymentHistory.map((entry) => (
-              <article key={entry.payment.id} className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <div className="text-sm font-semibold text-slate-100">{entry.childName}</div>
-                    <div className="text-xs text-slate-400">
-                      {new Date(entry.payment.created_at).toLocaleString("nb-NO")} · {entry.payment.method}
+          <>
+            <div className="hidden md:block">
+              <div className="space-y-3">
+                {paymentHistory.map((entry) => (
+                  <article key={entry.payment.id} className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <div className="text-sm font-semibold text-slate-100">{entry.childName}</div>
+                        <div className="text-xs text-slate-400">
+                          {new Date(entry.payment.created_at).toLocaleString("nb-NO")} ·{" "}
+                          {methodLabelMap[entry.payment.method as PaymentMethod] ?? entry.payment.method}
+                        </div>
+                      </div>
+                      <div className="text-sm font-semibold text-emerald-300">{formatKr(entry.payment.amount_ore)}</div>
                     </div>
+                    <div className="mt-3 space-y-2">
+                      {entry.claims.map((claim) => (
+                        <div key={claim.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm">
+                          <span>{claim.title}</span>
+                          <span className="font-semibold">{formatKr(claim.amount_ore)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3">
+                      <button
+                        type="button"
+                        onClick={() => void deletePayment(entry.payment.id)}
+                        className="rounded-lg border border-red-800 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-red-200 transition hover:border-red-700 hover:bg-red-950/40"
+                      >
+                        Slett
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+            <div className="md:hidden space-y-3">
+              {paymentHistory.map((entry) => (
+                <article key={entry.payment.id} className="rounded-xl border border-slate-700 bg-slate-950 p-4">
+                  <div className="space-y-1 text-sm text-slate-200">
+                    <p>
+                      <span className="font-semibold text-slate-100">Barn:</span> {entry.childName || entry.payment.child_id}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-slate-100">Sum:</span> {formatKr(entry.payment.amount_ore)}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-slate-100">Metode:</span>{" "}
+                      {methodLabelMap[entry.payment.method as PaymentMethod] ?? entry.payment.method}
+                    </p>
+                    <p>
+                      <span className="font-semibold text-slate-100">Dato:</span> {new Date(entry.payment.created_at).toLocaleString()}
+                    </p>
+                    {entry.payment.note && (
+                      <p>
+                        <span className="font-semibold text-slate-100">Notat:</span> {entry.payment.note}
+                      </p>
+                    )}
                   </div>
-                  <div className="text-sm font-semibold text-emerald-300">{formatKr(entry.payment.amount_ore)}</div>
-                </div>
-                <div className="mt-3 space-y-2">
-                  {entry.claims.map((claim) => (
-                    <div key={claim.id} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm">
-                      <span>{claim.title}</span>
-                      <span className="font-semibold">{formatKr(claim.amount_ore)}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3">
-                  <button
-                    type="button"
-                    onClick={() => void deletePayment(entry.payment.id)}
-                    className="rounded-lg border border-red-800 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-red-200 transition hover:border-red-700 hover:bg-red-950/40"
-                  >
-                    Slett
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => void deletePayment(entry.payment.id)}
+                      className="w-full rounded-lg border border-red-800 px-3 py-2.5 text-sm font-semibold text-red-200 transition hover:border-red-700 hover:bg-red-950/40"
+                    >
+                      Slett
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </section>
