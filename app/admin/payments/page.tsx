@@ -402,8 +402,8 @@ export default function AdminPaymentsPage() {
               value={method}
               onChange={(e) => setMethod(e.target.value as PaymentMethod)}
             >
-              <option value="VIPPS">Vipps</option>
               <option value="CASH">Kontanter</option>
+              <option value="VIPPS">Vipps</option>
               <option value="BANK">Bank</option>
               <option value="OTHER">Annet</option>
             </select>
