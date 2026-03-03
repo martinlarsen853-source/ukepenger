@@ -1,0 +1,12 @@
+**/.next/cache
+**/node_modules
+**/*.log
+**/tmp
+**/uploads
+**/*.sqlite*
+**/.env*
+**/.DS_Store
+**/.git
+**/.windsurf
+**/roleback*/**
+cookies.txt
