@@ -1,154 +1,197 @@
-ï»¿"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Ukepenger – full kontroll pa ukepengene",
+  description:
+    "Barna registrerer oppgaver. Du godkjenner pa mobilen og utbetaler nar det passer.",
+};
 
 export default function HomePage() {
-  const [hasSession, setHasSession] = useState(false);
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const run = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-        if (!mounted) return;
-        if (error) {
-          setChecking(false);
-          return;
-        }
-
-        const sessionExists = Boolean(data.session);
-        setHasSession(sessionExists);
-
-        if (sessionExists) {
-          window.location.replace("/admin/inbox");
-          return;
-        }
-
-        setChecking(false);
-      } catch {
-        // Keep landing page visible if session lookup fails.
-        if (mounted) setChecking(false);
-      }
-    };
-
-    void run();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (checking) {
-    return (
-      <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
-        <div className="flex min-h-screen items-center justify-center">
-          <p className="text-sm text-slate-300">Sender deg til admin...</p>
-        </div>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
-      <header className="sticky top-0 z-20 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <div className="text-xl font-semibold tracking-tight">Ukepenger</div>
-          <nav className="hidden items-center gap-6 text-sm text-slate-300 md:flex">
-            <a href="#hvordan" className="transition hover:text-white">Hvordan det funker</a>
-            <a href="#foreldre" className="transition hover:text-white">For foreldre</a>
-            <a href="#barn" className="transition hover:text-white">For barn</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold hover:border-slate-500">
-              Logg inn
-            </Link>
-            {hasSession && (
-              <Link href="/admin/inbox" className="rounded-lg bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">
-                Gaa til admin
+    <main className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-3xl" />
+      <div className="pointer-events-none absolute right-0 top-1/3 h-72 w-72 rounded-full bg-indigo-500/15 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-950 to-black" />
+
+      <section className="relative py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="max-w-3xl">
+            <p className="inline-flex rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">
+              Foreldre-kontroll
+            </p>
+            <h1 className="mt-6 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
+              Full kontroll pa ukepengene.
+            </h1>
+            <p className="mt-5 text-lg text-slate-300">
+              Barna registrerer oppgaver. Du godkjenner pa mobilen og utbetaler nar det passer.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/login"
+                className="rounded-xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/25 transition hover:bg-cyan-300"
+              >
+                Kom i gang
               </Link>
-            )}
+              <Link
+                href="#how"
+                className="rounded-xl border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-100 backdrop-blur transition hover:border-white/40"
+              >
+                Se hvordan det funker
+              </Link>
+            </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-20 pt-16 md:grid-cols-2 md:pt-24">
-        <div>
-          <p className="mb-4 inline-flex rounded-full border border-emerald-700/60 bg-emerald-900/30 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-200">
-            Ukepenger.no
-          </p>
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight md:text-6xl">Ukepenger uten mas</h1>
-          <p className="mt-5 max-w-xl text-lg text-slate-300">
-            Barn sender inn oppgaver, foreldre godkjenner, og dere far tydelig oversikt over hva som er tjent og utbetalt.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/login" className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300">
+      <section className="relative py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-5 backdrop-blur shadow-2xl shadow-black/40">
+              <p className="text-sm font-semibold text-cyan-200">Barn</p>
+              <div className="mt-4 rounded-2xl border border-white/15 bg-slate-900/80 p-4">
+                <p className="text-sm text-slate-400">Saldo i dag</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                  <li className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <span>Venter</span>
+                    <span>10 kr</span>
+                  </li>
+                  <li className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <span>Til gode</span>
+                    <span>25 kr</span>
+                  </li>
+                  <li className="flex items-center justify-between rounded-xl border border-white/10 bg-cyan-400/10 px-3 py-2 font-semibold text-cyan-100">
+                    <span>Totalt</span>
+                    <span>35 kr</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="mt-4 space-y-2 text-sm">
+                <div className="flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3 py-2">
+                  <span>Rydde rom</span>
+                  <span className="text-slate-300">5 kr</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3 py-2">
+                  <span>Ta ut soppel</span>
+                  <span className="text-slate-300">5 kr</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl border border-white/15 bg-white/5 px-3 py-2">
+                  <span>Tomme oppvaskmaskin</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-300">10 kr</span>
+                    <span className="rounded-full border border-emerald-300/30 bg-emerald-400/20 px-2 py-0.5 text-xs font-semibold text-emerald-100">
+                      Sendt
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-5 backdrop-blur shadow-2xl shadow-black/40">
+              <p className="text-sm font-semibold text-indigo-200">Forelder</p>
+              <div className="mt-4 rounded-2xl border border-white/15 bg-slate-900/80 p-4">
+                <h3 className="text-sm font-semibold text-slate-200">Ventende krav</h3>
+                <div className="mt-3 space-y-2 text-sm">
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <p className="font-medium">Noah • Rydde rom • 5 kr</p>
+                    <span className="mt-1 inline-flex rounded-full border border-amber-300/30 bg-amber-400/20 px-2 py-0.5 text-xs font-semibold text-amber-100">
+                      Venter
+                    </span>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                    <p className="font-medium">Maja • Tomme oppvaskmaskin • 10 kr</p>
+                    <span className="mt-1 inline-flex rounded-full border border-amber-300/30 bg-amber-400/20 px-2 py-0.5 text-xs font-semibold text-amber-100">
+                      Venter
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    className="rounded-xl bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950"
+                  >
+                    Godkjenn
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-xl border border-white/20 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-100"
+                  >
+                    Avvis
+                  </button>
+                </div>
+              </div>
+              <div className="mt-4 rounded-2xl border border-white/15 bg-slate-900/80 p-4">
+                <h3 className="text-sm font-semibold text-slate-200">Utbetalinger</h3>
+                <button
+                  type="button"
+                  className="mt-3 w-full rounded-xl bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950"
+                >
+                  Utbetal alt (25 kr)
+                </button>
+                <p className="mt-3 text-sm text-slate-300">Metode: Kontanter</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid gap-4 md:grid-cols-3">
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur shadow-xl shadow-black/30">
+              <h2 className="text-xl font-semibold">Kontroll og oversikt</h2>
+              <p className="mt-2 text-sm text-slate-300">Se saldo og historikk samlet for hele familien.</p>
+            </article>
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur shadow-xl shadow-black/30">
+              <h2 className="text-xl font-semibold">Mindre mas</h2>
+              <p className="mt-2 text-sm text-slate-300">Barna registrerer selv, sa du slipper a holde styr manuelt.</p>
+            </article>
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur shadow-xl shadow-black/30">
+              <h2 className="text-xl font-semibold">Mobil-first</h2>
+              <p className="mt-2 text-sm text-slate-300">Godkjenn og utbetal pa telefon, uansett hvor du er.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" className="relative py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Slik funker det</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur shadow-xl shadow-black/30">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">Steg 1</p>
+              <h3 className="mt-2 text-lg font-semibold">Velg oppgaver</h3>
+              <p className="mt-2 text-sm text-slate-300">Start med forslag - eller lag egne.</p>
+            </article>
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur shadow-xl shadow-black/30">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">Steg 2</p>
+              <h3 className="mt-2 text-lg font-semibold">Barn sender krav</h3>
+              <p className="mt-2 text-sm text-slate-300">Oppgaver registreres fortlopende av barna.</p>
+            </article>
+            <article className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur shadow-xl shadow-black/30">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-200">Steg 3</p>
+              <h3 className="mt-2 text-lg font-semibold">Du godkjenner og utbetaler</h3>
+              <p className="mt-2 text-sm text-slate-300">Alt holdes oppdatert med fa trykk.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="rounded-2xl border border-white/20 bg-white/10 p-8 text-center backdrop-blur shadow-2xl shadow-black/40">
+            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Kom i gang pa 2 minutter</h2>
+            <p className="mt-3 text-slate-300">Gratis a bruke.</p>
+            <Link
+              href="/login"
+              className="mt-6 inline-flex rounded-xl bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/30 transition hover:bg-cyan-300"
+            >
               Kom i gang
             </Link>
-            <Link href="/kids" className="rounded-xl border border-slate-700 px-5 py-3 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-900">
-              Barn
-            </Link>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-black/30">
-          <h2 className="text-xl font-semibold">Tre steg til full kontroll</h2>
-          <div className="mt-5 space-y-3 text-sm text-slate-300">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">1. Barn gjor oppgave og sender krav</div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">2. Forelder godkjenner i admin</div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">3. Utbetaling og historikk holdes oppdatert</div>
           </div>
         </div>
       </section>
-
-      <section id="hvordan" className="mx-auto max-w-6xl px-4 py-12">
-        <h2 className="text-2xl font-semibold tracking-tight">Hvordan det funker</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-            <h3 className="text-lg font-semibold">Barn gjor oppgave</h3>
-            <p className="mt-2 text-sm text-slate-300">Barn velger oppgave og sender inn med ett trykk.</p>
-          </article>
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-            <h3 className="text-lg font-semibold">Forelder godkjenner</h3>
-            <p className="mt-2 text-sm text-slate-300">Innboksen viser ventende krav og belop.</p>
-          </article>
-          <article className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-            <h3 className="text-lg font-semibold">Utbetaling og oversikt</h3>
-            <p className="mt-2 text-sm text-slate-300">Marker utbetalt og behold kvitteringer samlet.</p>
-          </article>
-        </div>
-      </section>
-
-      <section id="foreldre" className="mx-auto max-w-6xl px-4 py-12">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-2xl font-semibold tracking-tight">For foreldre</h2>
-          <p className="mt-3 text-slate-300">Mindre mas hjemme. Du ser hva som er sendt inn, godkjenner med kontroll og registrerer utbetaling enkelt.</p>
-        </div>
-      </section>
-
-      <section id="barn" className="mx-auto max-w-6xl px-4 py-12">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-          <h2 className="text-2xl font-semibold tracking-tight">For barn</h2>
-          <p className="mt-3 text-slate-300">Fargerik og enkel opplevelse med klare oppgaver, rask feedback og tydelig progresjon.</p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 pb-20 pt-10">
-        <div className="rounded-2xl border border-emerald-800/70 bg-emerald-950/30 p-8 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">Klar for a teste med familien?</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-slate-200">Sett opp pa noen minutter og start med deres forste oppgaver i dag.</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link href="/login" className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 hover:bg-emerald-300">Kom i gang</Link>
-            <Link href="/kids" className="rounded-xl border border-slate-600 px-5 py-3 text-sm font-semibold text-slate-100 hover:border-slate-400">Barn</Link>
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-slate-800 px-4 py-8 text-center text-sm text-slate-400">
-        Â© {new Date().getFullYear()} Ukepenger.no
-      </footer>
     </main>
   );
 }
