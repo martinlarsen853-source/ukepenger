@@ -51,7 +51,7 @@ export async function GET(request: Request) {
 
   const itemsRes = await supabase
     .from("wishlist_items")
-    .select("id, child_id, title, target_ore, note, active, created_at")
+    .select("id, title, target_ore, note, created_at")
     .eq("family_id", auth.familyId)
     .eq("child_id", childId)
     .eq("active", true)

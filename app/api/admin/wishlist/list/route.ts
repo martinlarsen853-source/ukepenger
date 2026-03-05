@@ -24,7 +24,7 @@ function parseAuthToken(req: Request) {
   return header.slice(7).trim();
 }
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   const { url, anonKey } = getSupabaseEnv();
   if (!url || !anonKey) {
     return NextResponse.json({ error: "Supabase env mangler." }, { status: 500 });
@@ -61,30 +61,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Ingen admin-tilgang." }, { status: 403 });
   }
 
-  let body: { childId?: string; title?: string; targetOre?: number; note?: string } = {};
-  try {
-    body = (await request.json()) as { childId?: string; title?: string; targetOre?: number; note?: string };
-  } catch {
-    return NextResponse.json({ error: "Ugyldig JSON." }, { status: 400 });
+  const childId = new URL(request.url).searchParams.get("childId")?.trim() ?? "";
+  if (!childId) {
+    return NextResponse.json({ error: "Mangler childId." }, { status: 400 });
   }
 
-  const childId = body.childId?.trim() ?? "";
-  const title = body.title?.trim() ?? "";
-  const targetOre = Number(body.targetOre);
-  const note = body.note?.trim() ? body.note.trim() : null;
-
-  if (!childId || !title) {
-    return NextResponse.json({ error: "Mangler childId eller title." }, { status: 400 });
-  }
-  if (!Number.isInteger(targetOre) || targetOre <= 0) {
-    return NextResponse.json({ error: "targetOre ma vaere et positivt heltall." }, { status: 400 });
-  }
-
-  const childRes = await serviceClient
-    .from("children")
-    .select("id, family_id")
-    .eq("id", childId)
-    .maybeSingle();
+  const childRes = await serviceClient.from("children").select("id, family_id").eq("id", childId).maybeSingle();
   if (childRes.error || !childRes.data) {
     return NextResponse.json({ error: childRes.error?.message ?? "Barn ikke funnet." }, { status: 404 });
   }
@@ -94,23 +76,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Barnet tilhorer ikke din familie." }, { status: 403 });
   }
 
-  const insertRes = await serviceClient
+  const itemsRes = await serviceClient
     .from("wishlist_items")
-    .insert({
-      family_id: profile.family_id,
-      child_id: childId,
-      title,
-      target_ore: targetOre,
-      note,
-      active: true,
-    })
-    .select("id")
-    .single();
+    .select("id, title, target_ore, note, created_at")
+    .eq("family_id", profile.family_id)
+    .eq("child_id", childId)
+    .eq("active", true)
+    .order("created_at", { ascending: false });
 
-  if (insertRes.error || !insertRes.data) {
-    return NextResponse.json({ error: insertRes.error?.message ?? "Kunne ikke lagre onskeliste-item." }, { status: 400 });
+  if (itemsRes.error) {
+    return NextResponse.json({ error: itemsRes.error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ items: itemsRes.data ?? [] });
 }
 

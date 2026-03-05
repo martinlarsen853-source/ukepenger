@@ -22,6 +22,18 @@ type ChildTaskSettingRow = {
   enabled: boolean;
 };
 
+type WishlistItem = {
+  id: string;
+  title: string;
+  target_ore: number;
+  note: string | null;
+  created_at: string;
+};
+
+function formatKr(ore: number) {
+  return `${(ore / 100).toFixed(2)} kr`;
+}
+
 export default function AdminChildTaskSettingsPage() {
   const params = useParams<{ id: string }>();
   const childId = params.id;
@@ -34,8 +46,10 @@ export default function AdminChildTaskSettingsPage() {
   const [wishlistTitle, setWishlistTitle] = useState("");
   const [wishlistTargetKr, setWishlistTargetKr] = useState("");
   const [wishlistNote, setWishlistNote] = useState("");
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [wishlistStatus, setWishlistStatus] = useState("");
   const [wishlistSaving, setWishlistSaving] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (nextFamilyId?: string) => {
@@ -71,6 +85,37 @@ export default function AdminChildTaskSettingsPage() {
     setEnabledMap(map);
   }, [childId, familyId]);
 
+  const loadWishlist = useCallback(async () => {
+    setWishlistStatus("");
+    setWishlistLoading(true);
+
+    const sessionRes = await supabase.auth.getSession();
+    const accessToken = sessionRes.data.session?.access_token;
+    if (!accessToken) {
+      setWishlistItems([]);
+      setWishlistLoading(false);
+      setWishlistStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      return;
+    }
+
+    const response = await fetch(`/api/admin/wishlist/list?childId=${encodeURIComponent(childId)}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const payload = (await response.json().catch(() => ({}))) as { error?: string; items?: WishlistItem[] };
+    setWishlistLoading(false);
+
+    if (!response.ok || payload.error) {
+      setWishlistItems([]);
+      setWishlistStatus(`Feil: ${payload.error ?? "Kunne ikke hente onskeliste."}`);
+      return;
+    }
+
+    setWishlistItems(payload.items ?? []);
+  }, [childId]);
+
   useEffect(() => {
     const run = async () => {
       const ctx = await getCurrentAdminContext();
@@ -81,11 +126,12 @@ export default function AdminChildTaskSettingsPage() {
       }
       setFamilyId(ctx.familyId);
       await load(ctx.familyId);
+      await loadWishlist();
       setLoading(false);
     };
 
     void run();
-  }, [childId, load]);
+  }, [childId, load, loadWishlist]);
 
   const isEnabled = (taskId: string) => enabledMap[taskId] !== false;
 
@@ -154,12 +200,16 @@ export default function AdminChildTaskSettingsPage() {
     setWishlistTargetKr("");
     setWishlistNote("");
     setWishlistStatus("Onskeliste-item lagt til.");
+    await loadWishlist();
   };
 
   if (loading) return <div className="text-slate-300">Laster...</div>;
   if (!child) return <div className="text-slate-300">Barn ikke funnet.</div>;
 
   const isError = status.startsWith("Feil:");
+  const parsedTargetKr = Number(wishlistTargetKr);
+  const parsedTargetOre = Number.isFinite(parsedTargetKr) ? Math.round(parsedTargetKr * 100) : 0;
+  const canSubmitWishlist = wishlistTitle.trim().length > 0 && parsedTargetOre > 0 && !wishlistSaving;
 
   return (
     <section className="space-y-5">
@@ -206,7 +256,7 @@ export default function AdminChildTaskSettingsPage() {
               value={wishlistTargetKr}
               onChange={(e) => setWishlistTargetKr(e.target.value)}
               type="number"
-              min="1"
+              min="0"
               step="0.01"
               placeholder="299.00"
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
@@ -225,8 +275,8 @@ export default function AdminChildTaskSettingsPage() {
         <button
           type="button"
           onClick={() => void createWishlistItem()}
-          disabled={wishlistSaving}
-          className="mt-3 rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!canSubmitWishlist}
+          className="mt-3 w-full rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
         >
           {wishlistSaving ? "Lagrer..." : "Legg til"}
         </button>
@@ -241,6 +291,27 @@ export default function AdminChildTaskSettingsPage() {
             {wishlistStatus}
           </p>
         )}
+
+        <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950 p-3">
+          <h4 className="text-sm font-semibold text-slate-100">Eksisterende onsker</h4>
+          {wishlistLoading ? (
+            <p className="mt-2 text-sm text-slate-400">Laster...</p>
+          ) : wishlistItems.length === 0 ? (
+            <p className="mt-2 text-sm text-slate-400">Ingen onskeliste enda.</p>
+          ) : (
+            <div className="mt-2 space-y-2">
+              {wishlistItems.map((item) => (
+                <div key={item.id} className="rounded-lg border border-slate-800 bg-slate-900 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+                    <span className="text-xs text-slate-300">{formatKr(item.target_ore)}</span>
+                  </div>
+                  {item.note && <p className="mt-1 text-xs text-slate-400">{item.note}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
