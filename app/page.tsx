@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Ukepenger – full kontroll pa ukepengene",
+  title: "Ukepenger - full kontroll pa ukepengene",
   description:
     "Barna registrerer oppgaver. Du godkjenner pa mobilen og utbetaler nar det passer.",
 };
@@ -94,13 +94,13 @@ export default function HomePage() {
                 <h3 className="text-sm font-semibold text-slate-200">Ventende krav</h3>
                 <div className="mt-3 space-y-2 text-sm">
                   <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                    <p className="font-medium">Noah • Rydde rom • 5 kr</p>
+                    <p className="font-medium">Noah | Rydde rom | 5 kr</p>
                     <span className="mt-1 inline-flex rounded-full border border-amber-300/30 bg-amber-400/20 px-2 py-0.5 text-xs font-semibold text-amber-100">
                       Venter
                     </span>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                    <p className="font-medium">Maja • Tomme oppvaskmaskin • 10 kr</p>
+                    <p className="font-medium">Maja | Tomme oppvaskmaskin | 10 kr</p>
                     <span className="mt-1 inline-flex rounded-full border border-amber-300/30 bg-amber-400/20 px-2 py-0.5 text-xs font-semibold text-amber-100">
                       Venter
                     </span>
