@@ -18,6 +18,13 @@ type TaskRow = {
   active: boolean;
 };
 
+type WishlistItem = {
+  id: string;
+  title: string;
+  target_ore: number;
+  note: string | null;
+};
+
 const cardColors = [
   "from-cyan-500 to-blue-500",
   "from-emerald-500 to-lime-500",
@@ -45,14 +52,22 @@ export default function KidTaskPage() {
   const [pendingOre, setPendingOre] = useState(0);
   const [approvedOre, setApprovedOre] = useState(0);
   const [totalOre, setTotalOre] = useState(0);
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
 
   useEffect(() => {
     const run = async () => {
-      const res = await fetch(`/api/kids/tasks?childId=${encodeURIComponent(childId)}`, {
-        method: "GET",
-        credentials: "include",
-      });
-      const payload = (await res.json()) as {
+      const [tasksRes, wishlistRes] = await Promise.all([
+        fetch(`/api/kids/tasks?childId=${encodeURIComponent(childId)}`, {
+          method: "GET",
+          credentials: "include",
+        }),
+        fetch(`/api/kids/wishlist?childId=${encodeURIComponent(childId)}`, {
+          method: "GET",
+          credentials: "include",
+        }),
+      ]);
+
+      const tasksPayload = (await tasksRes.json()) as {
         error?: string;
         child?: ChildRow;
         tasks?: TaskRow[];
@@ -62,18 +77,29 @@ export default function KidTaskPage() {
         total_ore?: number;
       };
 
-      if (!res.ok || payload.error || !payload.child) {
-        setStatus(payload.error ?? "Klarte ikke laste barn/oppgaver.");
+      if (!tasksRes.ok || tasksPayload.error || !tasksPayload.child) {
+        setStatus(tasksPayload.error ?? "Klarte ikke laste barn/oppgaver.");
         setShowLoginLink(true);
         return;
       }
 
-      setChild(payload.child);
-      setTasks(payload.tasks ?? []);
-      setCooldowns(payload.cooldowns ?? {});
-      setPendingOre(payload.pending_ore ?? 0);
-      setApprovedOre(payload.approved_ore ?? 0);
-      setTotalOre(payload.total_ore ?? 0);
+      setChild(tasksPayload.child);
+      setTasks(tasksPayload.tasks ?? []);
+      setCooldowns(tasksPayload.cooldowns ?? {});
+      setPendingOre(tasksPayload.pending_ore ?? 0);
+      setApprovedOre(tasksPayload.approved_ore ?? 0);
+      setTotalOre(tasksPayload.total_ore ?? 0);
+
+      const wishlistPayload = (await wishlistRes.json().catch(() => ({}))) as {
+        error?: string;
+        items?: WishlistItem[];
+      };
+      if (wishlistRes.ok && !wishlistPayload.error) {
+        setWishlistItems(wishlistPayload.items ?? []);
+      } else {
+        setWishlistItems([]);
+      }
+
       setShowLoginLink(false);
       setStatus("");
     };
@@ -173,6 +199,29 @@ export default function KidTaskPage() {
             <div className="mt-1 text-xs text-slate-400">
               Venter: {formatKr(pendingOre)} &bull; Til gode: {formatKr(approvedOre)}
             </div>
+          </div>
+
+          <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950 p-3">
+            <h2 className="text-sm font-semibold text-slate-100">Onskeliste</h2>
+            {wishlistItems.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-400">Ingen onskeliste enda.</p>
+            ) : (
+              <div className="mt-2 space-y-2">
+                {wishlistItems.map((item) => {
+                  const missingOre = Math.max(0, item.target_ore - approvedOre);
+                  return (
+                    <div key={item.id} className="rounded-lg border border-slate-800 bg-slate-900 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+                        <span className="text-xs text-slate-300">Maal: {formatKr(item.target_ore)}</span>
+                      </div>
+                      <p className="mt-1 text-xs text-slate-400">Mangler {formatKr(missingOre)}</p>
+                      {item.note && <p className="mt-1 text-xs text-slate-500">{item.note}</p>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
