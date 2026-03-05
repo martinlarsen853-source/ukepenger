@@ -78,40 +78,40 @@ function Nav() {
 function PhoneMock({ variant = "tasks" }: { variant?: "tasks" | "approve" | "payout" }) {
   return (
     <div className="relative w-full max-w-[520px]">
-      <div className="rounded-[32px] border border-white/15 bg-white/95 p-3 shadow-[0_40px_100px_-40px_rgba(0,0,0,0.55)]">
-        <div className="rounded-[26px] border border-slate-200 bg-slate-50 p-4">
-          <div className="mb-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500">
+      <div className="rounded-[32px] border border-white/10 bg-white/5 p-3 shadow-[0_40px_120px_rgba(0,0,0,0.6)] backdrop-blur">
+        <div className="rounded-[26px] border border-white/10 bg-slate-900/85 p-4">
+          <div className="mb-4 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300">
             <div className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-red-300" />
               <span className="h-2 w-2 rounded-full bg-amber-300" />
               <span className="h-2 w-2 rounded-full bg-emerald-300" />
             </div>
-            <span className="font-medium text-slate-700">App preview</span>
+            <span className="font-medium text-slate-100">App preview</span>
             <span className="w-8" />
           </div>
 
           {variant === "tasks" && (
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+            <div className="space-y-2 text-sm text-slate-100">
+              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
                 <span>Rydde rom</span>
                 <span>5 kr</span>
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
                 <span>Tomme oppvaskmaskin</span>
                 <span>10 kr</span>
               </div>
-              <button type="button" className="w-full rounded-xl bg-lime-400 px-4 py-2.5 font-semibold text-slate-900">
+              <button type="button" className="w-full rounded-xl bg-lime-400 px-4 py-2.5 font-medium text-black shadow-lg">
                 Send krav
               </button>
             </div>
           )}
 
           {variant === "approve" && (
-            <div className="space-y-2 text-sm">
-              <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <div className="space-y-2 text-sm text-slate-100">
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-emerald-400/20 text-xs font-semibold text-emerald-200">
                       NO
                     </span>
                     <span className="font-medium">Noah | Rydde rom</span>
@@ -120,10 +120,10 @@ function PhoneMock({ variant = "tasks" }: { variant?: "tasks" | "approve" | "pay
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <button type="button" className="rounded-xl bg-lime-400 px-3 py-2.5 font-semibold text-slate-900">
+                <button type="button" className="rounded-xl bg-lime-400 px-3 py-2.5 font-medium text-black shadow-lg">
                   Godkjenn
                 </button>
-                <button type="button" className="rounded-xl border border-slate-300 bg-white px-3 py-2.5 font-semibold text-slate-700">
+                <button type="button" className="rounded-xl border border-white/20 bg-white/5 px-3 py-2.5 font-medium text-slate-100">
                   Avvis
                 </button>
               </div>
@@ -131,13 +131,13 @@ function PhoneMock({ variant = "tasks" }: { variant?: "tasks" | "approve" | "pay
           )}
 
           {variant === "payout" && (
-            <div className="space-y-2 text-sm">
-              <div className="rounded-xl border border-slate-200 bg-white p-3">
-                <p className="font-medium text-slate-900">Til gode</p>
-                <p className="text-slate-600">25 kr</p>
+            <div className="space-y-2 text-sm text-slate-100">
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <p className="font-medium">Til gode</p>
+                <p className="text-slate-300">25 kr</p>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-3 text-slate-600">Kontanter / Vipps / Bank</div>
-              <button type="button" className="w-full rounded-xl bg-lime-400 px-4 py-2.5 font-semibold text-slate-900">
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-slate-300">Kontanter / Vipps / Bank</div>
+              <button type="button" className="w-full rounded-xl bg-lime-400 px-4 py-2.5 font-medium text-black shadow-lg">
                 Utbetal
               </button>
             </div>
@@ -152,8 +152,8 @@ function DebitCardMock() {
   return (
     <motion.div
       aria-hidden="true"
-      className="absolute -right-4 top-8 w-52 rounded-3xl border border-white/20 bg-slate-900/70 p-4 text-white shadow-2xl backdrop-blur md:w-60"
-      animate={{ y: [0, -8, 0], rotate: [0, 1.6, 0] }}
+      className="absolute -right-4 top-8 w-52 rotate-3 rounded-3xl border border-white/20 bg-slate-900/70 p-4 text-white shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur md:w-60"
+      animate={{ y: [0, -8, 0], rotate: [3, 4.6, 3] }}
       transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
     >
       <p className="text-xs text-slate-300">Ukepenger</p>
@@ -169,8 +169,8 @@ function DebitCardMock() {
 
 function StatItem({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-      <span className="text-lime-300">
+    <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 backdrop-blur">
+      <span className="text-emerald-400">
         <CheckIcon />
       </span>
       <span>{label}</span>
@@ -180,30 +180,30 @@ function StatItem({ label }: { label: string }) {
 
 function FeatureCard({ title, text }: { title: string; text: string }) {
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 text-slate-600">{text}</p>
+    <article className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl backdrop-blur md:p-8">
+      <h3 className="text-xl font-semibold text-white">{title}</h3>
+      <p className="mt-2 text-slate-300">{text}</p>
     </article>
   );
 }
 
 function StepCard({ n, title }: { n: string; title: string }) {
   return (
-    <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-lime-300 font-semibold text-slate-900">{n}</span>
-      <h3 className="mt-4 text-xl font-semibold text-slate-900">{title}</h3>
+    <article className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl backdrop-blur md:p-8">
+      <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-lime-400 font-semibold text-black">{n}</span>
+      <h3 className="mt-4 text-xl font-semibold text-white">{title}</h3>
     </article>
   );
 }
 
 export default function LandingClient() {
   return (
-    <main className="bg-slate-50 text-slate-900">
+    <main className="bg-gradient-to-b from-slate-950 via-emerald-950 to-emerald-900 text-white">
       <Nav />
 
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-950 to-emerald-950 py-20 text-white md:py-28">
-        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-950 to-emerald-950 py-24 text-white md:py-32">
+        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-emerald-500/20 blur-3xl" />
+        <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-cyan-500/15 blur-3xl" />
 
         <Container className="grid items-center gap-14 lg:grid-cols-2">
           <motion.div
@@ -213,18 +213,18 @@ export default function LandingClient() {
             className="max-w-[520px]"
           >
             <p className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold tracking-[0.14em]">FAMILIEAPP</p>
-            <h1 className="mt-6 text-5xl font-semibold tracking-tight md:text-7xl">Full kontroll paa ukepenger.</h1>
-            <p className="mt-6 text-lg text-slate-300 md:text-xl">Barn registrerer oppgaver. Du godkjenner og betaler.</p>
+            <h1 className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight md:text-7xl">Full kontroll paa ukepenger.</h1>
+            <p className="mt-6 max-w-xl text-lg text-slate-300 md:text-xl">Barn registrerer oppgaver. Du godkjenner og betaler.</p>
 
             <div className="mt-10 flex flex-wrap items-center gap-6">
               <Link
                 href="/login"
                 aria-label="Kom i gang"
-                className="inline-flex min-h-12 items-center rounded-xl bg-lime-300 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-lime-900/20 transition hover:bg-lime-400"
+                className="inline-flex min-h-12 items-center rounded-xl bg-lime-400 px-6 py-3 text-sm font-medium text-black shadow-lg transition hover:bg-lime-300"
               >
                 Kom i gang
               </Link>
-              <a href="#how" className="inline-flex min-h-12 items-center gap-2 text-sm font-semibold text-slate-200 transition hover:text-white" aria-label="Se hvordan det funker">
+              <a href="#how" className="inline-flex min-h-12 items-center gap-2 text-sm font-semibold text-white/80 transition hover:text-white" aria-label="Se hvordan det funker">
                 Se hvordan det funker
                 <ArrowIcon />
               </a>
@@ -238,6 +238,8 @@ export default function LandingClient() {
           </motion.div>
 
           <div className="relative mx-auto w-full max-w-[560px]">
+            <div className="pointer-events-none absolute -z-10 left-8 top-14 h-[400px] w-[400px] rounded-full bg-emerald-500 opacity-40 blur-3xl" />
+            <div className="pointer-events-none absolute -z-10 left-24 top-2 h-[340px] w-[340px] rounded-full bg-cyan-500/20 blur-3xl" />
             <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}>
               <PhoneMock variant="tasks" />
             </motion.div>
@@ -246,23 +248,23 @@ export default function LandingClient() {
         </Container>
       </section>
 
-      <section className="bg-white py-16 md:py-24">
+      <section className="bg-emerald-950 py-20 md:py-24">
         <Container className="grid items-center gap-10 md:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Oppgaver</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Barn registrerer oppgaver</h2>
-            <p className="mt-4 text-slate-600">Gi barna en enkel oversikt over oppgaver og belop. De sender krav med ett trykk.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300">Oppgaver</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">Barn registrerer oppgaver</h2>
+            <p className="mt-4 text-slate-300">Gi barna en enkel oversikt over oppgaver og belop. De sender krav med ett trykk.</p>
           </div>
           <PhoneMock variant="tasks" />
         </Container>
       </section>
 
-      <section className="bg-slate-50 py-16 md:py-24">
+      <section className="bg-gradient-to-b from-emerald-950 to-emerald-900 py-20 md:py-24">
         <Container className="grid items-center gap-10 md:grid-cols-2">
           <div className="md:order-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Godkjenning</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Du godkjenner</h2>
-            <p className="mt-4 text-slate-600">Se innsendte krav i en ryddig innboks og godkjenn eller avvis med tydelig kontroll.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300">Godkjenning</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">Du godkjenner</h2>
+            <p className="mt-4 text-slate-300">Se innsendte krav i en ryddig innboks og godkjenn eller avvis med tydelig kontroll.</p>
           </div>
           <div className="md:order-1">
             <PhoneMock variant="approve" />
@@ -270,20 +272,20 @@ export default function LandingClient() {
         </Container>
       </section>
 
-      <section className="bg-white py-16 md:py-24">
+      <section className="bg-emerald-950 py-20 md:py-24">
         <Container className="grid items-center gap-10 md:grid-cols-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">Utbetaling</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Utbetal naar det passer</h2>
-            <p className="mt-4 text-slate-600">Velg metode og utbetal i ditt tempo. Historikken holder styr paa alt.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-300">Utbetaling</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">Utbetal naar det passer</h2>
+            <p className="mt-4 text-slate-300">Velg metode og utbetal i ditt tempo. Historikken holder styr paa alt.</p>
           </div>
           <PhoneMock variant="payout" />
         </Container>
       </section>
 
-      <section id="benefits" className="bg-slate-50 py-16 md:py-24">
+      <section id="benefits" className="bg-gradient-to-b from-emerald-950 to-emerald-900 py-20 md:py-24">
         <Container>
-          <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Fordeler</h2>
+          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Fordeler</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <FeatureCard title="Kontroll og oversikt" text="Se saldo, krav og utbetaling samlet for hele familien." />
             <FeatureCard title="Mindre mas" text="Barn sender selv, og du svarer raskt uten manuelle lister." />
@@ -292,9 +294,9 @@ export default function LandingClient() {
         </Container>
       </section>
 
-      <section id="how" className="bg-white py-16 md:py-24">
+      <section id="how" className="bg-emerald-950 py-20 md:py-24">
         <Container>
-          <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Slik funker det</h2>
+          <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">Slik funker det</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <StepCard n="1" title="Velg oppgaver" />
             <StepCard n="2" title="Barn sender krav" />
@@ -303,15 +305,15 @@ export default function LandingClient() {
         </Container>
       </section>
 
-      <section className="bg-slate-50 py-16 md:py-24">
+      <section className="bg-slate-950 py-20 md:py-24">
         <Container>
-          <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-center text-white md:p-12">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-white shadow-xl backdrop-blur md:p-12">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Kom i gang paa 2 minutter</h2>
             <p className="mt-3 text-slate-300">Gratis a bruke.</p>
             <Link
               href="/login"
               aria-label="Kom i gang naa"
-              className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-lime-300 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-lime-900/20 transition hover:bg-lime-400"
+              className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-lime-400 px-6 py-3 text-sm font-medium text-black shadow-lg transition hover:bg-lime-300"
             >
               Kom i gang
             </Link>
