@@ -526,9 +526,9 @@ export default function LandingClient() {
         <div className="pointer-events-none absolute -top-24 left-[8%] h-[520px] w-[520px] rounded-full bg-cyan-400/8 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-52 right-[6%] h-[660px] w-[660px] rounded-full bg-lime-300/6 blur-3xl" />
 
-        <Container className="relative py-24 md:py-32">
+        <Container className="relative pt-16 pb-20 md:py-32">
           <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
-            <div>
+            <div className="order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold tracking-[0.18em] text-white/80 backdrop-blur">
                 <span className="h-2 w-2 rounded-full bg-lime-300" />
                 FAMILIEAPP
@@ -549,20 +549,6 @@ export default function LandingClient() {
                 </SecondaryLink>
               </div>
 
-              <div className="mt-6 flex justify-center lg:hidden">
-                <motion.div
-                  className="w-full max-w-[420px]"
-                  animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
-                  transition={
-                    reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }
-                  }
-                >
-                  <DeviceFrame className="w-full">
-                    <HeroDeviceDemo />
-                  </DeviceFrame>
-                </motion.div>
-              </div>
-
               <div className="mt-8 flex flex-wrap gap-3">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur">
                   <IconCheck className="h-4 w-4 text-lime-300" />
@@ -579,9 +565,9 @@ export default function LandingClient() {
               </div>
             </div>
 
-            <div className="relative hidden lg:block">
+            <div className="order-1 lg:order-2 relative">
               <motion.div
-                className="relative mx-auto w-full max-w-[620px]"
+                className="relative mx-auto w-full max-w-[420px] lg:max-w-[620px]"
                 animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
                 transition={
                   reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }
