@@ -131,35 +131,6 @@ function DeviceFrame(props: { className?: string; children: React.ReactNode }) {
   );
 }
 
-function DebitCardOverlay() {
-  return (
-    <div className="relative overflow-hidden rounded-[28px] border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/80 to-emerald-950/85 p-5 text-white shadow-[0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur">
-      <div className="pointer-events-none absolute -right-12 -top-14 h-40 w-40 rounded-full bg-lime-300/10 blur-2xl" />
-      <div className="pointer-events-none absolute -left-12 -bottom-14 h-40 w-40 rounded-full bg-emerald-400/10 blur-2xl" />
-
-      <div className="flex items-start justify-between">
-        <div className="text-sm font-semibold tracking-tight">Ukepenger</div>
-        <div className="h-7 w-10 rounded-md border border-white/20 bg-white/10" />
-      </div>
-
-      <div className="mt-6 text-[11px] uppercase tracking-[0.18em] text-white/55">Familie</div>
-      <div className="mt-2 font-mono text-sm tracking-[0.28em] text-white/90">**** **** **** 8531</div>
-
-      <div className="mt-7 flex items-end justify-between">
-        <div>
-          <div className="text-[10px] text-white/55">GYLDIG TIL</div>
-          <div className="text-xs font-medium">12/29</div>
-        </div>
-
-        <div className="flex items-center">
-          <span className="h-7 w-7 rounded-full bg-white/20" />
-          <span className="-ml-2 h-7 w-7 rounded-full bg-lime-400/45" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function DemoHeader(props: { title: string; subtitle?: string }) {
   return (
     <div className="mb-4">
@@ -355,10 +326,10 @@ function HeroDeviceDemo() {
     if (reduceMotion) return;
 
     const schedule: Array<{ step: HeroStep; ms: number }> = [
-      { step: 0, ms: 2200 },
-      { step: 1, ms: 1200 },
-      { step: 2, ms: 1800 },
-      { step: 3, ms: 1800 },
+      { step: 0, ms: 3500 },
+      { step: 1, ms: 2000 },
+      { step: 2, ms: 3000 },
+      { step: 3, ms: 3000 },
     ];
 
     let idx = 0;
@@ -551,9 +522,9 @@ export default function LandingClient() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-emerald-950" />
-        <div className="pointer-events-none absolute -top-44 left-1/2 h-[760px] w-[760px] -translate-x-1/2 rounded-full bg-emerald-400/18 blur-3xl" />
-        <div className="pointer-events-none absolute -top-24 left-[8%] h-[520px] w-[520px] rounded-full bg-cyan-400/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-52 right-[6%] h-[660px] w-[660px] rounded-full bg-lime-300/10 blur-3xl" />
+        <div className="pointer-events-none absolute -top-44 left-1/2 h-[760px] w-[760px] -translate-x-1/2 rounded-full bg-emerald-400/12 blur-3xl" />
+        <div className="pointer-events-none absolute -top-24 left-[8%] h-[520px] w-[520px] rounded-full bg-cyan-400/8 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-52 right-[6%] h-[660px] w-[660px] rounded-full bg-lime-300/6 blur-3xl" />
 
         <Container className="relative py-24 md:py-32">
           <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
@@ -578,23 +549,37 @@ export default function LandingClient() {
                 </SecondaryLink>
               </div>
 
+              <div className="mt-6 flex justify-center lg:hidden">
+                <motion.div
+                  className="w-full max-w-[420px]"
+                  animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
+                  transition={
+                    reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }
+                  }
+                >
+                  <DeviceFrame className="w-full">
+                    <HeroDeviceDemo />
+                  </DeviceFrame>
+                </motion.div>
+              </div>
+
               <div className="mt-8 flex flex-wrap gap-3">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur">
                   <IconCheck className="h-4 w-4 text-lime-300" />
-                  4.8 stjerner
+                  Goy for barna
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur">
                   <IconCheck className="h-4 w-4 text-lime-300" />
-                  Mobilvennlig
+                  Mindre mas hjemme
                 </div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur">
                   <IconCheck className="h-4 w-4 text-lime-300" />
-                  Full historikk
+                  Full oversikt
                 </div>
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative hidden lg:block">
               <motion.div
                 className="relative mx-auto w-full max-w-[620px]"
                 animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
@@ -605,16 +590,6 @@ export default function LandingClient() {
                 <DeviceFrame className="w-full">
                   <HeroDeviceDemo />
                 </DeviceFrame>
-
-                <motion.div
-                  className="absolute -bottom-8 -left-6 w-[280px] md:w-[330px]"
-                  animate={reduceMotion ? undefined : { y: [0, 10, 0], rotate: [3, 1, 3] }}
-                  transition={
-                    reduceMotion ? undefined : { duration: 7, repeat: Infinity, ease: "easeInOut" }
-                  }
-                >
-                  <DebitCardOverlay />
-                </motion.div>
               </motion.div>
             </div>
           </div>
