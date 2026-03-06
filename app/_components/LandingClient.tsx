@@ -163,7 +163,7 @@ function DemoTasks() {
       <div className="space-y-2">
         <DemoRow left="Rydde rom" right="+10 kr" />
         <DemoRow left="Tomme oppvaskmaskin" right="+10 kr" />
-        <DemoRow left="Gaa tur" right="+5 kr" />
+        <DemoRow left="Gå tur" right="+5 kr" />
       </div>
 
       <button className="mt-4 w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-700">
@@ -196,7 +196,7 @@ function DemoSending() {
 function DemoSent() {
   return (
     <div>
-      <DemoHeader title="Krav sendt" subtitle="Venter paa godkjenning" />
+      <DemoHeader title="Krav sendt" subtitle="Venter på godkjenning" />
 
       <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
         <div className="flex items-start gap-3">
@@ -214,7 +214,7 @@ function DemoSent() {
 
       <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
         <div className="text-xs text-slate-500">Status</div>
-        <div className="text-sm font-semibold text-slate-900">Venter paa godkjenning</div>
+        <div className="text-sm font-semibold text-slate-900">Venter på godkjenning</div>
       </div>
     </div>
   );
@@ -280,7 +280,7 @@ function WishlistMock() {
 
   return (
     <div>
-      <DemoHeader title="Sparemaal" subtitle="Spar til noe du oensker deg" />
+      <DemoHeader title="Sparemål" subtitle="Spar til nø du ønsker deg" />
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
         <div className="flex items-center justify-between gap-3">
@@ -309,7 +309,7 @@ function WishlistMock() {
 
         <div className="mt-4 space-y-2">
           <DemoRow left="Rydde rom" right="+10 kr" badge="Godkjent" />
-          <DemoRow left="Gaa tur" right="+5 kr" badge="Sendt" />
+          <DemoRow left="Gå tur" right="+5 kr" badge="Sendt" />
         </div>
       </div>
     </div>
@@ -535,7 +535,7 @@ export default function LandingClient() {
               </div>
 
               <h1 className="mt-6 max-w-[11ch] text-5xl font-semibold tracking-tight text-white md:text-7xl md:leading-[1.02]">
-                Full kontroll paa ukepenger
+                Full kontroll på ukepenger
               </h1>
 
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75 md:text-xl">
@@ -641,7 +641,7 @@ export default function LandingClient() {
             <div className="order-1 lg:order-2">
               <SectionTitle
                 eyebrow="FORELDER"
-                title="Du godkjenner paa sekunder"
+                title="Du godkjenner på sekunder"
                 desc="Krav havner i innboksen. Godkjenn eller avvis med ett trykk."
               />
             </div>
@@ -655,7 +655,7 @@ export default function LandingClient() {
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <SectionTitle
               eyebrow="UTBETALING"
-              title="Utbetal naar det passer"
+              title="Utbetal når det passer"
               desc="Marker utbetaling og hold historikken ryddig. Kontanter, Vipps eller bank."
             />
             <div className="flex justify-center lg:justify-end">
@@ -697,7 +697,7 @@ export default function LandingClient() {
                 <div className="text-base font-semibold text-white">Mindre mas</div>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-white/70">
-                Barna sender krav i appen. Du godkjenner naar det passer.
+                Barna sender krav i appen. Du godkjenner når det passer.
               </p>
             </GlassCard>
 
@@ -722,8 +722,8 @@ export default function LandingClient() {
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <SectionTitle
               eyebrow="SPARING"
-              title="Spar til noe du oensker deg"
-              desc="Onskeliste og sparemaal gir barna motivasjon. Ukepenger faar en tydelig mening."
+              title="Spar til nø du ønsker deg"
+              desc="Onskeliste og sparemål gir barna motivasjon. Ukepenger får en tydelig mening."
             />
             <div className="flex justify-center lg:justify-end">
               <StaticPhone variant="wishlist" />
@@ -746,7 +746,7 @@ export default function LandingClient() {
                 <GlassCard className="p-5">
                   <div className="text-sm font-semibold text-white">Tipset som funker</div>
                   <p className="mt-2 text-sm text-white/70">
-                    Start med 3-5 oppgaver, godkjenn paa mobilen, og utbetal fast en gang i uka.
+                    Start med 3-5 oppgaver, godkjenn på mobilen, og utbetal fast en gang i uka.
                   </p>
                 </GlassCard>
               </div>
@@ -760,7 +760,7 @@ export default function LandingClient() {
                 <div className="text-xs font-semibold tracking-[0.22em] text-lime-300/90">BILDEPLASSHOLDER</div>
                 <div className="mt-3 text-lg font-semibold text-white">Bytt inn et ekte familie-bilde</div>
                 <p className="mt-2 text-sm text-white/70">
-                  Ett ekte bilde er ofte nok for aa faa mer Greenlight-foelelse.
+                  Ett ekte bilde er ofte nok for å få mer Greenlight-følelse.
                 </p>
 
                 <div className="mt-6 grid grid-cols-2 gap-3">
@@ -799,7 +799,7 @@ export default function LandingClient() {
               {
                 n: "3",
                 t: "Du godkjenner og utbetaler",
-                d: "Godkjenn paa mobilen og marker utbetaling naar det passer.",
+                d: "Godkjenn på mobilen og marker utbetaling når det passer.",
               },
             ].map((item) => (
               <GlassCard key={item.n}>
@@ -828,9 +828,9 @@ export default function LandingClient() {
             <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
               <div>
                 <div className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
-                  Kom i gang paa 2 minutter
+                  Kom i gang på 2 minutter
                 </div>
-                <div className="mt-2 text-sm text-white/70">Gratis aa bruke.</div>
+                <div className="mt-2 text-sm text-white/70">Gratis å bruke.</div>
               </div>
 
               <PrimaryButtonLink href="/login" className="px-7 py-3 text-sm">
