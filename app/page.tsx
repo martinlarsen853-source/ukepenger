@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import LandingClient from "@/app/_components/LandingClient";
+import LandingClient from "./_components/LandingClient";
 
 export const metadata: Metadata = {
-  title: "Ukepenger - full kontroll paa ukepenger",
-  description: "Barn registrerer oppgaver. Du godkjenner og betaler.",
+  title: "Ukepenger | Full kontroll paa ukepenger",
+  description:
+    "Barn registrerer oppgaver. Du godkjenner og betaler. En enkel familie-app for ukepenger.",
 };
 
-export default function HomePage() {
+export default function Page() {
   return <LandingClient />;
 }
 
