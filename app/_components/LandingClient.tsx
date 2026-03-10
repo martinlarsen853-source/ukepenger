@@ -85,7 +85,7 @@ function PrimaryButton(props: {
   onClick?: () => void;
 }) {
   const classes = cn(
-    "inline-flex items-center justify-center rounded-full bg-primary px-7 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+    "inline-flex items-center justify-center rounded-full bg-primary px-7 py-4 text-base font-semibold text-accent-foreground shadow-lg transition hover:bg-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
     props.className
   );
 
@@ -180,7 +180,7 @@ function DemoTasks() {
         <DemoRow left="Ga tur med hunden" right="+15 kr" />
       </div>
 
-      <button className="mt-4 w-full rounded-2xl bg-primary px-4 py-3.5 text-base font-semibold text-white shadow-md hover:bg-primary-dark">
+      <button className="mt-4 w-full rounded-2xl bg-primary px-4 py-3.5 text-base font-semibold text-accent-foreground shadow-md hover:bg-primary-dark">
         Send krav
       </button>
     </div>
@@ -211,7 +211,7 @@ function DemoSent() {
 
       <div className="mt-4 rounded-2xl bg-primary/10 p-4">
         <div className="flex items-start gap-3">
-          <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
+          <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-accent-foreground">
             <IconCheck className="h-5 w-5" />
           </span>
           <div>
@@ -239,7 +239,7 @@ function DemoInbox() {
       <div className="rounded-2xl bg-muted p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-semibold text-white">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-semibold text-accent-foreground">
               N
             </div>
             <div>
@@ -251,7 +251,7 @@ function DemoInbox() {
         </div>
 
         <div className="mt-4 flex gap-2">
-          <button className="flex-1 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-dark">
+          <button className="flex-1 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-accent-foreground hover:bg-primary-dark">
             Godkjenn
           </button>
           <button className="flex-1 rounded-2xl bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground hover:bg-foreground/20">
@@ -336,7 +336,7 @@ function Nav() {
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-foreground">
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-            <span className="h-2 w-2 rounded-full bg-white" />
+            <span className="h-2 w-2 rounded-full bg-accent-foreground" />
           </span>
           Ukepenger
         </Link>
@@ -624,7 +624,7 @@ export default function LandingClient() {
               },
             ].map((item) => (
               <div key={item.step} className="relative rounded-3xl bg-muted p-6">
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-xl font-bold text-white">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-xl font-bold text-accent-foreground">
                   {item.step}
                 </div>
                 <h3 className="mt-4 text-xl font-semibold text-foreground">{item.title}</h3>
@@ -708,16 +708,16 @@ export default function LandingClient() {
       <section className="bg-primary py-16 md:py-20">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+            <h2 className="text-3xl font-bold tracking-tight text-accent-foreground md:text-4xl">
               Kom i gang pa 2 minutter
             </h2>
-            <p className="mt-4 text-lg text-white/80">
+            <p className="mt-4 text-lg text-accent-foreground/80">
               Gratis a bruke. Ingen kredittkort nodvendig.
             </p>
             <div className="mt-8">
               <PrimaryButton
                 href="/login"
-                className="bg-white text-primary hover:bg-white/90"
+                className="bg-accent-foreground text-primary hover:bg-accent-foreground/90"
               >
                 Start gratis na
                 <IconArrowRight className="ml-2 h-5 w-5" />
@@ -733,7 +733,7 @@ export default function LandingClient() {
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-2 font-bold text-lg text-foreground">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-                <span className="h-2 w-2 rounded-full bg-white" />
+                <span className="h-2 w-2 rounded-full bg-accent-foreground" />
               </span>
               Ukepenger
             </div>
