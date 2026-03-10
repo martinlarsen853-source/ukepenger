@@ -84,10 +84,7 @@ function Nav() {
         </Link>
 
         <nav className="hidden items-center gap-10 md:flex">
-          <Link href="#demo" className="text-sm text-muted-foreground hover:text-foreground transition">
-            Demo
-          </Link>
-          <Link href="#features" className="text-sm text-muted-foreground hover:text-foreground transition">
+          <Link href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200">
             Funksjoner
           </Link>
         </nav>
@@ -98,7 +95,7 @@ function Nav() {
           </Link>
           <Link
             href="/login"
-            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-accent-foreground transition hover:bg-primary-dark"
+            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-accent-foreground transition-all duration-300 hover:bg-primary-dark hover:scale-105"
           >
             Kom i gang
           </Link>
@@ -139,13 +136,6 @@ function Nav() {
             </div>
 
             <nav className="mt-8 space-y-1 px-6">
-              <Link
-                href="#demo"
-                className="block py-4 text-2xl font-semibold text-foreground"
-                onClick={() => setOpen(false)}
-              >
-                Demo
-              </Link>
               <Link
                 href="#features"
                 className="block py-4 text-2xl font-semibold text-foreground"
@@ -189,6 +179,7 @@ function PhoneDemo() {
     "parent",     // Parent sees inbox
     "approve",    // Parent approves
     "balance",    // Child sees updated balance
+    "wishlist",   // Child sees wishlist
   ];
 
   useEffect(() => {
@@ -196,7 +187,7 @@ function PhoneDemo() {
     
     const interval = setInterval(() => {
       setCurrentScene((prev) => (prev + 1) % scenes.length);
-    }, 3000);
+    }, 3500);
     
     return () => clearInterval(interval);
   }, [reduceMotion, scenes.length]);
@@ -236,6 +227,9 @@ function PhoneDemo() {
               )}
               {currentScene === 5 && (
                 <SceneBalance key="balance" />
+              )}
+              {currentScene === 6 && (
+                <SceneWishlist key="wishlist" />
               )}
             </AnimatePresence>
 
@@ -279,12 +273,12 @@ function PhoneDemo() {
   );
 }
 
-// Scene components with smooth animations
+// Scene components with smooth cinematic animations
 const sceneTransition = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
-  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+  initial: { opacity: 0, y: 30, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -20, scale: 0.98 },
+  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
 };
 
 function SceneTaskList() {
@@ -634,6 +628,99 @@ function SceneBalance() {
   );
 }
 
+function SceneWishlist() {
+  return (
+    <motion.div {...sceneTransition} className="h-full p-5 pt-16">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20 text-2xl">
+          🐯
+        </div>
+        <div>
+          <p className="font-bold text-foreground">Evelina</p>
+          <p className="text-sm text-muted-foreground">Min onskeliste</p>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <p className="mb-4 text-sm font-medium text-muted-foreground">Jeg sparer til:</p>
+        
+        <motion.div 
+          className="rounded-2xl bg-card p-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-pink-500/20 text-2xl">
+              🎀
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-foreground">Nytt halskjede</p>
+              <p className="text-sm text-muted-foreground">150 kr</p>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>32 av 150 kr</span>
+              <span>21%</span>
+            </div>
+            <div className="mt-1.5 h-2.5 w-full rounded-full bg-muted">
+              <motion.div 
+                className="h-full rounded-full bg-gradient-to-r from-pink-500 to-rose-400"
+                initial={{ width: 0 }}
+                animate={{ width: "21%" }}
+                transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="mt-3 rounded-2xl bg-card p-4"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-purple-500/20 text-2xl">
+              🎮
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-foreground">Nintendo spill</p>
+              <p className="text-sm text-muted-foreground">499 kr</p>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>32 av 499 kr</span>
+              <span>6%</span>
+            </div>
+            <div className="mt-1.5 h-2.5 w-full rounded-full bg-muted">
+              <motion.div 
+                className="h-full rounded-full bg-gradient-to-r from-purple-500 to-violet-400"
+                initial={{ width: 0 }}
+                animate={{ width: "6%" }}
+                transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+              />
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <motion.button 
+        className="mt-5 w-full rounded-2xl bg-card py-3 text-sm font-semibold text-primary"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        + Legg til nytt onske
+      </motion.button>
+    </motion.div>
+  );
+}
+
 // QR Code Setup Demo - iPad and iPhone side by side
 function QRSetupDemo() {
   const [step, setStep] = useState(0);
@@ -891,23 +978,17 @@ export default function LandingClient() {
               Barn registrerer oppgaver. Foreldre godkjenner. Alt pa ett sted.
             </motion.p>
             <motion.div 
-              className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center"
+              className="mt-10"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <Link
                 href="/login"
-                className="inline-flex h-14 items-center justify-center rounded-2xl bg-primary px-8 text-base font-semibold text-accent-foreground transition hover:bg-primary-dark"
+                className="inline-flex h-14 items-center justify-center rounded-2xl bg-primary px-8 text-base font-semibold text-accent-foreground transition-all duration-300 hover:bg-primary-dark hover:scale-105"
               >
-                Kom i gang gratis
+                Kom i gang
                 <IconArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-              <Link
-                href="#demo"
-                className="inline-flex h-14 items-center justify-center rounded-2xl border border-border px-8 text-base font-semibold text-foreground transition hover:bg-card"
-              >
-                Se demo
               </Link>
             </motion.div>
           </div>
@@ -1031,9 +1112,9 @@ export default function LandingClient() {
             <div className="mt-10">
               <Link
                 href="/login"
-                className="inline-flex h-14 items-center justify-center rounded-2xl bg-primary px-8 text-base font-semibold text-accent-foreground transition hover:bg-primary-dark"
+                className="inline-flex h-14 items-center justify-center rounded-2xl bg-primary px-8 text-base font-semibold text-accent-foreground transition-all duration-300 hover:bg-primary-dark hover:scale-105"
               >
-                Start gratis
+                Kom i gang
                 <IconArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </div>
