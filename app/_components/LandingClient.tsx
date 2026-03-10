@@ -377,7 +377,7 @@ function TaskCard(props: { title: string; amount: string; gradient: string; sele
     >
       <p className="font-bold text-white">{props.title}</p>
       <p className="text-2xl font-bold text-white">{props.amount} kr</p>
-      <p className="mt-1 text-sm text-white/80">Trykk for aa sende krav</p>
+      <p className="mt-1 text-sm text-white/80">Trykk for å sende krav</p>
     </motion.div>
   );
 }
@@ -518,7 +518,7 @@ function SceneParentInbox() {
           </div>
           <div className="flex-1">
             <p className="text-lg font-bold text-foreground">Evelina</p>
-            <p className="text-sm text-muted-foreground">2 oppgaver fullfort</p>
+            <p className="text-sm text-muted-foreground">2 oppgaver fullført</p>
           </div>
           <div className="text-right">
             <p className="text-xl font-bold text-primary">7.00 kr</p>
@@ -993,6 +993,33 @@ function FeatureCard(props: { icon: React.ReactNode; title: string; description:
 }
 
 export default function LandingClient() {
+  const productFlow = [
+    {
+      step: "1",
+      title: "G\u00F8r oppgaver",
+      description: "Barnet velger oppgaver og registrerer dem i appen.",
+      value: "Oppgaver",
+    },
+    {
+      step: "2",
+      title: "Tjen ukepenger",
+      description: "Forelder godkjenner, og ukepenger legges til saldo.",
+      value: "+25 kr",
+    },
+    {
+      step: "3",
+      title: "Sparing",
+      description: "Pengene samles i saldo med tydelig spareprogresjon.",
+      value: "70%",
+    },
+    {
+      step: "4",
+      title: "\u00D8nskeliste",
+      description: "Spar til noe du \u00F8nsker deg og f\u00F8lg m\u00E5let uke for uke.",
+      value: "M\u00E5l",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
@@ -1001,24 +1028,24 @@ export default function LandingClient() {
       <section className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
-            <motion.h1 
+            <motion.h1
               className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <span className="block text-balance">Ukepenger for</span>
-              <span className="block text-balance text-primary">hele familien.</span>
+              <span className="block text-balance">Ukepenger med oppgaver,</span>
+              <span className="block text-balance text-primary">sparing og \u00D8nskeliste.</span>
             </motion.h1>
-            <motion.p 
+            <motion.p
               className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Barn registrerer oppgaver. Foreldre godkjenner. Alt på ett sted.
+              Gj\u00F8r oppgaver, tjen ukepenger og spar til m\u00E5l.
             </motion.p>
-            <motion.div 
+            <motion.div
               className="mt-10"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1036,60 +1063,27 @@ export default function LandingClient() {
         </Container>
       </section>
 
-      {/* Phone Demo Section */}
-      <section id="demo" className="scroll-mt-20 py-16 sm:py-24">
+      {/* 3 Key Benefits */}
+      <section className="border-t border-border py-16 sm:py-20">
         <Container>
           <div className="mx-auto max-w-xl text-center">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Se hvordan det fungerer
+              Tre tydelige fordeler
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Fra oppgave til godkjenning på sekunder.
+              Bygd for familier som vil gj\u00F8re ukepenger enkelt i praksis.
             </p>
           </div>
 
-          <div className="mt-12 sm:mt-16">
-            <PhoneDemo />
-          </div>
-        </Container>
-      </section>
-
-      {/* QR Setup Section */}
-      <section className="border-t border-border py-16 sm:py-24">
-        <Container>
-          <div className="mx-auto max-w-xl text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Enkel oppsett med QR-kode
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Barnet skanner koden - ferdig på sekunder.
-            </p>
-          </div>
-
-          <div className="mt-12 sm:mt-16">
-            <QRSetupDemo />
-          </div>
-        </Container>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="scroll-mt-20 border-t border-border py-16 sm:py-24">
-        <Container>
-          <div className="mx-auto max-w-xl text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Alt du trenger
-            </h2>
-          </div>
-
-          <div className="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:mt-14 md:grid-cols-3">
             <FeatureCard
               icon={
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2m-6 9l2 2 4-4" />
                 </svg>
               }
-              title="Oppgaveliste"
-              description="Definer oppgaver med belønning. Barna velger og registrerer selv hva de har gjort."
+              title="Oppgaver som gir motivasjon"
+              description="Barna ser hva de kan gj\u00F8re, og hva hver oppgave gir i ukepenger."
             />
             <FeatureCard
               icon={
@@ -1097,45 +1091,74 @@ export default function LandingClient() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
-              title="Enkel godkjenning"
-              description="Se alle krav i innboksen. Godkjenn med ett trykk når oppgavene er gjort."
+              title="Ukepenger med kontroll"
+              description="Foreldre godkjenner krav, f\u00F8lger saldo og har full oversikt."
             />
             <FeatureCard
               icon={
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
-              title="Full oversikt"
-              description="Hold styr på saldo, utbetalinger og sparemål for alle barna."
+              title="Sparing med \u00D8nskeliste"
+              description="Spar til noe du \u00F8nsker deg med tydelig progresjon mot m\u00E5l."
             />
-            <FeatureCard
-              icon={
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              }
-              title="Flere barn"
-              description="Legg til så mange barn du vil. Hver med sin egen profil og saldo."
-            />
-            <FeatureCard
-              icon={
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              }
-              title="Fungerer overalt"
-              description="Mobil, nettbrett eller PC. Appen tilpasser seg enheten."
-            />
-            <FeatureCard
-              icon={
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              }
-              title="Trygt og sikkert"
-              description="All data er kryptert. Kun familien har tilgang."
-            />
+          </div>
+        </Container>
+      </section>
+
+      {/* Product Story */}
+      <section id="features" className="scroll-mt-20 border-t border-border py-16 sm:py-24">
+        <Container>
+          <div className="mx-auto max-w-xl text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              Oppgaver, ukepenger, sparing og \u00D8nskeliste
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Spar til noe du \u00F8nsker deg med en flyt som er enkel \u00E5 forst\u00E5.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-4 sm:mt-16 md:grid-cols-2 lg:grid-cols-4">
+            {productFlow.map((item, index) => (
+              <motion.div
+                key={item.step}
+                className="rounded-3xl bg-card p-5"
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.35, delay: index * 0.06 }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                    {item.step}
+                  </span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {item.value}
+                  </span>
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+                {item.step === "3" ? (
+                  <div className="mt-4">
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+                      <motion.div
+                        className="h-full rounded-full bg-primary"
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "70%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">Sparing mot m\u00E5l</p>
+                  </div>
+                ) : null}
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-12 sm:mt-16">
+            <PhoneDemo />
           </div>
         </Container>
       </section>
@@ -1145,10 +1168,10 @@ export default function LandingClient() {
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Klar til å komme i gang?
+              Klar til \u00E5 komme i gang?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Gratis å bruke. Ingen kredittkort nødvendig.
+              Gj\u00F8r oppgaver, tjen ukepenger og spar til m\u00E5l.
             </p>
             <div className="mt-10">
               <Link
@@ -1173,9 +1196,7 @@ export default function LandingClient() {
               </span>
               <span className="font-semibold">Ukepenger</span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Laget for norske familier
-            </p>
+            <p className="text-sm text-muted-foreground">Laget for norske familier</p>
           </div>
         </Container>
       </footer>
