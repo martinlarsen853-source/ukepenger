@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -58,52 +57,75 @@ function IconMenu(props: { className?: string }) {
   );
 }
 
-function PrimaryButtonLink(props: {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
+function IconClose(props: { className?: string }) {
   return (
-    <Link
-      href={props.href}
-      className={cn(
-        "inline-flex items-center justify-center rounded-2xl bg-lime-400 px-6 py-3 text-sm font-semibold text-black shadow-[0_16px_40px_rgba(163,230,53,0.28)] ring-1 ring-lime-300/40 transition hover:bg-lime-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-200",
-        props.className
-      )}
-    >
-      {props.children}
-    </Link>
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className={props.className}>
+      <path
+        d="M5 5l10 10M15 5l-10 10"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
-function SecondaryLink(props: {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
+function IconStar(props: { className?: string }) {
   return (
-    <Link
-      href={props.href}
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-xl px-2 py-2 text-sm font-medium text-white/80 transition hover:text-white",
-        props.className
-      )}
-    >
-      {props.children}
-    </Link>
+    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className={props.className}>
+      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+    </svg>
   );
 }
 
-function GlassCard(props: { className?: string; children: React.ReactNode }) {
+function PrimaryButton(props: {
+  href?: string;
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) {
+  const classes = cn(
+    "inline-flex items-center justify-center rounded-full bg-primary px-7 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+    props.className
+  );
+
+  if (props.href) {
+    return (
+      <Link href={props.href} className={classes}>
+        {props.children}
+      </Link>
+    );
+  }
+
   return (
-    <div
-      className={cn(
-        "rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.42)] backdrop-blur",
-        props.className
-      )}
-    >
+    <button type="button" onClick={props.onClick} className={classes}>
       {props.children}
-    </div>
+    </button>
+  );
+}
+
+function SecondaryButton(props: {
+  href?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const classes = cn(
+    "inline-flex items-center justify-center rounded-full border-2 border-foreground/20 bg-transparent px-7 py-4 text-base font-semibold text-foreground transition hover:border-foreground/40 hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2",
+    props.className
+  );
+
+  if (props.href) {
+    return (
+      <Link href={props.href} className={classes}>
+        {props.children}
+      </Link>
+    );
+  }
+
+  return (
+    <button type="button" className={classes}>
+      {props.children}
+    </button>
   );
 }
 
@@ -111,21 +133,13 @@ function DeviceFrame(props: { className?: string; children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "relative rounded-[36px] border border-white/15 bg-white/5 shadow-[0_44px_140px_rgba(0,0,0,0.65)] backdrop-blur",
+        "relative rounded-[40px] bg-foreground p-2 shadow-2xl",
         props.className
       )}
     >
-      <div className="pointer-events-none absolute inset-0 rounded-[36px] bg-gradient-to-b from-white/12 via-transparent to-transparent" />
-      <div className="relative p-3">
-        <div className="overflow-hidden rounded-[30px] bg-white shadow-inner">
-          <div className="flex items-center gap-1 border-b border-slate-200 bg-slate-50 px-4 py-2">
-            <span className="h-2 w-2 rounded-full bg-red-400" />
-            <span className="h-2 w-2 rounded-full bg-amber-400" />
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            <div className="ml-auto text-[11px] font-medium text-slate-500">Ukepenger</div>
-          </div>
-          <div className="bg-white p-4 md:p-5">{props.children}</div>
-        </div>
+      <div className="absolute left-1/2 top-4 h-6 w-24 -translate-x-1/2 rounded-full bg-foreground" />
+      <div className="relative overflow-hidden rounded-[32px] bg-background">
+        <div className="pt-8">{props.children}</div>
       </div>
     </div>
   );
@@ -133,24 +147,24 @@ function DeviceFrame(props: { className?: string; children: React.ReactNode }) {
 
 function DemoHeader(props: { title: string; subtitle?: string }) {
   return (
-    <div className="mb-4">
-      <div className="text-sm font-semibold text-slate-900">{props.title}</div>
-      {props.subtitle ? <div className="mt-1 text-xs text-slate-500">{props.subtitle}</div> : null}
+    <div className="mb-4 px-4">
+      <div className="text-base font-semibold text-foreground">{props.title}</div>
+      {props.subtitle ? <div className="mt-1 text-sm text-muted-foreground">{props.subtitle}</div> : null}
     </div>
   );
 }
 
 function DemoRow(props: { left: string; right: string; badge?: string }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5">
-      <div className="text-sm font-medium text-slate-800">{props.left}</div>
+    <div className="flex items-center justify-between rounded-2xl bg-muted px-4 py-3">
+      <div className="text-sm font-medium text-foreground">{props.left}</div>
       <div className="flex items-center gap-2">
         {props.badge ? (
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
             {props.badge}
           </span>
         ) : null}
-        <div className="text-sm font-semibold text-slate-900">{props.right}</div>
+        <div className="text-sm font-semibold text-foreground">{props.right}</div>
       </div>
     </div>
   );
@@ -158,158 +172,91 @@ function DemoRow(props: { left: string; right: string; badge?: string }) {
 
 function DemoTasks() {
   return (
-    <div>
+    <div className="p-4">
       <DemoHeader title="Oppgaver" subtitle="Velg oppgaver og send krav" />
       <div className="space-y-2">
         <DemoRow left="Rydde rom" right="+10 kr" />
         <DemoRow left="Tomme oppvaskmaskin" right="+10 kr" />
-        <DemoRow left="Gå tur" right="+5 kr" />
+        <DemoRow left="Ga tur med hunden" right="+15 kr" />
       </div>
 
-      <button className="mt-4 w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-700">
+      <button className="mt-4 w-full rounded-2xl bg-primary px-4 py-3.5 text-base font-semibold text-white shadow-md hover:bg-primary-dark">
         Send krav
       </button>
-
-      <div className="mt-3 text-xs text-slate-500">
-        Barn sender inn. Forelder godkjenner i innboksen.
-      </div>
     </div>
   );
 }
+
 function DemoSending() {
   return (
-    <div>
+    <div className="p-4">
       <DemoHeader title="Sender..." subtitle="Registrerer kravet" />
-      <div className="mt-8 flex items-center justify-center">
-        <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 [animation-delay:120ms]" />
-          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 [animation-delay:240ms]" />
-          <span className="ml-2 text-sm font-medium text-slate-700">Sender krav</span>
+      <div className="mt-12 flex items-center justify-center">
+        <div className="flex items-center gap-2 rounded-full bg-muted px-5 py-3">
+          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-primary" />
+          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-primary [animation-delay:120ms]" />
+          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-primary [animation-delay:240ms]" />
+          <span className="ml-2 text-sm font-medium text-foreground">Sender krav</span>
         </div>
       </div>
-      <div className="mt-8 text-center text-xs text-slate-500">Dette tar et lite sekund...</div>
+      <div className="mt-12 text-center text-sm text-muted-foreground">Dette tar et lite sekund...</div>
     </div>
   );
 }
 
 function DemoSent() {
   return (
-    <div>
-      <DemoHeader title="Krav sendt" subtitle="Venter på godkjenning" />
+    <div className="p-4">
+      <DemoHeader title="Krav sendt" subtitle="Venter pa godkjenning" />
 
-      <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+      <div className="mt-4 rounded-2xl bg-primary/10 p-4">
         <div className="flex items-start gap-3">
-          <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-white">
+          <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
             <IconCheck className="h-5 w-5" />
           </span>
           <div>
-            <div className="text-sm font-semibold text-emerald-900">Ferdig</div>
-            <div className="mt-1 text-xs text-emerald-800">
-              Kravet er sendt. Forelder kan godkjenne i innboksen.
+            <div className="text-sm font-semibold text-foreground">Ferdig!</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              Kravet er sendt. Forelder kan godkjenne.
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3">
-        <div className="text-xs text-slate-500">Status</div>
-        <div className="text-sm font-semibold text-slate-900">Venter på godkjenning</div>
+      <div className="mt-4 rounded-2xl bg-muted px-4 py-3">
+        <div className="text-xs text-muted-foreground">Status</div>
+        <div className="text-sm font-semibold text-foreground">Venter pa godkjenning</div>
       </div>
     </div>
   );
 }
 
-function DemoInboxTease() {
+function DemoInbox() {
   return (
-    <div>
-      <DemoHeader title="Innboks" subtitle="Forelder godkjenner" />
+    <div className="p-4">
+      <DemoHeader title="Innboks" subtitle="Godkjenn krav fra barna" />
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+      <div className="rounded-2xl bg-muted p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-800">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-base font-semibold text-white">
               N
             </div>
             <div>
-              <div className="text-sm font-semibold text-slate-900">Noah</div>
-              <div className="text-xs text-slate-500">Rydde rom</div>
+              <div className="text-sm font-semibold text-foreground">Noah</div>
+              <div className="text-xs text-muted-foreground">Rydde rom</div>
             </div>
           </div>
-          <div className="text-sm font-semibold text-slate-900">10 kr</div>
+          <div className="text-base font-semibold text-foreground">10 kr</div>
         </div>
 
-        <div className="mt-3 flex gap-2">
-          <button className="flex-1 rounded-2xl bg-emerald-600 px-3 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
+        <div className="mt-4 flex gap-2">
+          <button className="flex-1 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white hover:bg-primary-dark">
             Godkjenn
           </button>
-          <button className="flex-1 rounded-2xl bg-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-300">
+          <button className="flex-1 rounded-2xl bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground hover:bg-foreground/20">
             Avvis
           </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PayoutMock() {
-  return (
-    <div>
-      <DemoHeader title="Utbetaling" subtitle="Marker som utbetalt" />
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <div className="flex items-baseline justify-between">
-          <div className="text-xs text-slate-500">Til gode</div>
-          <div className="text-2xl font-semibold text-slate-900">45 kr</div>
-        </div>
-
-        <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-3">
-          <div className="text-xs text-slate-500">Metode</div>
-          <div className="mt-1 text-sm font-semibold text-slate-900">Kontanter</div>
-        </div>
-
-        <button className="mt-4 w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700">
-          Utbetal
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function WishlistMock() {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <div>
-      <DemoHeader title="Sparemål" subtitle="Spar til nø du ønsker deg" />
-
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-sm font-semibold text-slate-900">Ny fotball</div>
-            <div className="mt-1 text-xs text-slate-500">80 / 250 kr</div>
-          </div>
-          <div className="rounded-full bg-emerald-100 px-2 py-1 text-[11px] font-semibold text-emerald-800">
-            32%
-          </div>
-        </div>
-
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
-          {reduceMotion ? (
-            <div className="h-full w-[32%] bg-emerald-600" />
-          ) : (
-            <motion.div
-              className="h-full bg-emerald-600"
-              initial={{ width: 0 }}
-              whileInView={{ width: "32%" }}
-              viewport={{ once: true, margin: "-20% 0px -20% 0px" }}
-              transition={{ duration: 1.1, ease: "easeOut" }}
-            />
-          )}
-        </div>
-
-        <div className="mt-4 space-y-2">
-          <DemoRow left="Rydde rom" right="+10 kr" badge="Godkjent" />
-          <DemoRow left="Gå tur" right="+5 kr" badge="Sendt" />
         </div>
       </div>
     </div>
@@ -360,7 +307,7 @@ function HeroDeviceDemo() {
       case 2:
         return <DemoSent />;
       case 3:
-        return <DemoInboxTease />;
+        return <DemoInbox />;
       default:
         return <DemoTasks />;
     }
@@ -370,9 +317,9 @@ function HeroDeviceDemo() {
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={reduceMotion ? "static" : step}
-        initial={{ opacity: 0, y: 10, filter: "blur(2px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -8, filter: "blur(2px)" }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
       >
         {content}
@@ -381,73 +328,47 @@ function HeroDeviceDemo() {
   );
 }
 
-function StaticPhone(props: { variant: "tasks" | "inbox" | "payout" | "wishlist" }) {
-  const content =
-    props.variant === "tasks" ? (
-      <DemoTasks />
-    ) : props.variant === "inbox" ? (
-      <DemoInboxTease />
-    ) : props.variant === "payout" ? (
-      <PayoutMock />
-    ) : (
-      <WishlistMock />
-    );
-
-  return <DeviceFrame className="w-full max-w-[560px]">{content}</DeviceFrame>;
-}
-
-function SectionTitle(props: { eyebrow?: string; title: string; desc: string }) {
-  return (
-    <div>
-      {props.eyebrow ? (
-        <div className="text-xs font-semibold tracking-[0.22em] text-lime-300/90">{props.eyebrow}</div>
-      ) : null}
-
-      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-        {props.title}
-      </h2>
-
-      <p className="mt-4 max-w-xl text-base leading-relaxed text-white/70 md:text-lg">
-        {props.desc}
-      </p>
-    </div>
-  );
-}
 function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/70 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <Container className="flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight text-white">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
-            <span className="h-2 w-2 rounded-full bg-lime-300" />
+        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-foreground">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
+            <span className="h-2 w-2 rounded-full bg-white" />
           </span>
           Ukepenger
         </Link>
 
-        <div className="hidden items-center gap-6 md:flex">
-          <Link href="#how" className="text-sm font-medium text-white/70 hover:text-white">
+        <nav className="hidden items-center gap-8 md:flex">
+          <Link href="#how" className="text-sm font-medium text-muted-foreground hover:text-foreground transition">
             Slik funker det
           </Link>
-          <Link href="#benefits" className="text-sm font-medium text-white/70 hover:text-white">
-            Fordeler
+          <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition">
+            Funksjoner
           </Link>
-          <Link href="/login" className="text-sm font-medium text-white/70 hover:text-white">
+          <Link href="#testimonials" className="text-sm font-medium text-muted-foreground hover:text-foreground transition">
+            Tilbakemeldinger
+          </Link>
+        </nav>
+
+        <div className="hidden items-center gap-4 md:flex">
+          <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition">
             Logg inn
           </Link>
-          <PrimaryButtonLink href="/login" className="px-5 py-2.5 text-sm">
+          <PrimaryButton href="/login" className="px-5 py-2.5 text-sm">
             Kom i gang
-          </PrimaryButtonLink>
+          </PrimaryButton>
         </div>
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 p-2 text-white md:hidden"
+          className="inline-flex items-center justify-center rounded-xl p-2 text-foreground md:hidden"
           onClick={() => setOpen(true)}
-          aria-label="Aapne meny"
+          aria-label="Apne meny"
         >
-          <IconMenu className="h-5 w-5" />
+          <IconMenu className="h-6 w-6" />
         </button>
       </Container>
 
@@ -459,56 +380,146 @@ function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
+            <div className="absolute inset-0 bg-foreground/20" onClick={() => setOpen(false)} />
             <motion.div
-              className="absolute right-3 top-3 w-[calc(100%-24px)] rounded-3xl border border-white/10 bg-slate-950/95 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.6)] backdrop-blur"
+              className="absolute inset-x-4 top-4 rounded-3xl bg-background p-6 shadow-2xl"
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -10, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
               <div className="flex items-center justify-between">
-                <div className="text-sm font-semibold text-white">Meny</div>
+                <span className="font-bold text-lg text-foreground">Meny</span>
                 <button
                   type="button"
-                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white"
+                  className="rounded-xl p-2 text-foreground hover:bg-muted"
                   onClick={() => setOpen(false)}
                 >
-                  Lukk
+                  <IconClose className="h-5 w-5" />
                 </button>
               </div>
 
-              <div className="mt-4 space-y-2">
+              <nav className="mt-6 space-y-2">
                 <Link
                   href="#how"
-                  className="block rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white"
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-foreground hover:bg-muted"
                   onClick={() => setOpen(false)}
                 >
                   Slik funker det
                 </Link>
                 <Link
-                  href="#benefits"
-                  className="block rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white"
+                  href="#features"
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-foreground hover:bg-muted"
                   onClick={() => setOpen(false)}
                 >
-                  Fordeler
+                  Funksjoner
+                </Link>
+                <Link
+                  href="#testimonials"
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-foreground hover:bg-muted"
+                  onClick={() => setOpen(false)}
+                >
+                  Tilbakemeldinger
                 </Link>
                 <Link
                   href="/login"
-                  className="block rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white"
+                  className="block rounded-2xl px-4 py-3 text-base font-medium text-foreground hover:bg-muted"
                   onClick={() => setOpen(false)}
                 >
                   Logg inn
                 </Link>
-                <PrimaryButtonLink href="/login" className="w-full">
+              </nav>
+
+              <div className="mt-6">
+                <PrimaryButton href="/login" className="w-full">
                   Kom i gang
-                </PrimaryButtonLink>
+                </PrimaryButton>
               </div>
             </motion.div>
           </motion.div>
         ) : null}
       </AnimatePresence>
+    </header>
+  );
+}
+
+function StatCard(props: { value: string; label: string }) {
+  return (
+    <div className="text-center">
+      <div className="text-3xl font-bold text-primary md:text-4xl">{props.value}</div>
+      <div className="mt-1 text-sm text-muted-foreground">{props.label}</div>
     </div>
+  );
+}
+
+function TestimonialCard(props: {
+  quote: string;
+  name: string;
+  role: string;
+}) {
+  return (
+    <div className="rounded-3xl bg-muted p-6">
+      <div className="flex gap-1">
+        {[...Array(5)].map((_, i) => (
+          <IconStar key={i} className="h-5 w-5 text-amber-400" />
+        ))}
+      </div>
+      <p className="mt-4 text-base leading-relaxed text-foreground">{props.quote}</p>
+      <div className="mt-4">
+        <div className="font-semibold text-foreground">{props.name}</div>
+        <div className="text-sm text-muted-foreground">{props.role}</div>
+      </div>
+    </div>
+  );
+}
+
+function FeatureCard(props: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-3xl border border-border bg-card p-6 transition hover:shadow-lg">
+      <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        {props.icon}
+      </div>
+      <h3 className="mt-4 text-lg font-semibold text-card-foreground">{props.title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{props.description}</p>
+    </div>
+  );
+}
+
+function IconTasks(props: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={props.className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+    </svg>
+  );
+}
+
+function IconWallet(props: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={props.className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+    </svg>
+  );
+}
+
+function IconTarget(props: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={props.className}>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+}
+
+function IconFamily(props: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={props.className}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
   );
 }
 
@@ -516,61 +527,49 @@ export default function LandingClient() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Nav />
 
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950 to-emerald-950" />
-        <div className="pointer-events-none absolute -top-44 left-1/2 h-[760px] w-[760px] -translate-x-1/2 rounded-full bg-emerald-400/12 blur-3xl" />
-        <div className="pointer-events-none absolute -top-24 left-[8%] h-[520px] w-[520px] rounded-full bg-cyan-400/8 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-52 right-[6%] h-[660px] w-[660px] rounded-full bg-lime-300/6 blur-3xl" />
-
-        <Container className="relative pt-16 pb-20 md:py-32">
-          <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
-            <div className="order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold tracking-[0.18em] text-white/80 backdrop-blur">
-                <span className="h-2 w-2 rounded-full bg-lime-300" />
-                FAMILIEAPP
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary-light/50 to-background">
+        <Container className="relative py-12 md:py-20">
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <IconStar key={i} className="h-4 w-4 text-amber-400" />
+                  ))}
+                </div>
+                Elsket av norske familier
               </div>
 
-              <h1 className="mt-6 max-w-[11ch] text-5xl font-semibold tracking-tight text-white md:text-7xl md:leading-[1.02]">
-                Full kontroll på ukepenger
+              <h1 className="mt-6 text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
+                <span className="block">Ukepenger for barn.</span>
+                <span className="block text-primary">Familie-appen som funker.</span>
               </h1>
 
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75 md:text-xl">
-                Barn registrerer oppgaver. Du godkjenner og betaler.
+              <p className="mt-6 text-lg leading-relaxed text-muted-foreground md:text-xl">
+                Barn registrerer oppgaver. Du godkjenner og betaler. Enkelt, oversiktlig og motiverende for hele familien.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <PrimaryButtonLink href="/login">Kom i gang</PrimaryButtonLink>
-                <SecondaryLink href="#how">
-                  Se hvordan det funker <IconArrowRight className="h-4 w-4" />
-                </SecondaryLink>
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur">
-                  <IconCheck className="h-4 w-4 text-lime-300" />
-                  Goy for barna
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur">
-                  <IconCheck className="h-4 w-4 text-lime-300" />
-                  Mindre mas hjemme
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur">
-                  <IconCheck className="h-4 w-4 text-lime-300" />
-                  Full oversikt
-                </div>
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
+                <PrimaryButton href="/login">
+                  Kom i gang gratis
+                  <IconArrowRight className="ml-2 h-5 w-5" />
+                </PrimaryButton>
+                <SecondaryButton href="#how">
+                  Se hvordan det funker
+                </SecondaryButton>
               </div>
             </div>
 
-            <div className="order-1 lg:order-2 relative">
+            <div className="relative flex justify-center lg:justify-end">
               <motion.div
-                className="relative mx-auto w-full max-w-[420px] lg:max-w-[620px]"
-                animate={reduceMotion ? undefined : { y: [0, -10, 0] }}
+                className="relative w-full max-w-[320px]"
+                animate={reduceMotion ? undefined : { y: [0, -8, 0] }}
                 transition={
-                  reduceMotion ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }
+                  reduceMotion ? undefined : { duration: 5, repeat: Infinity, ease: "easeInOut" }
                 }
               >
                 <DeviceFrame className="w-full">
@@ -582,254 +581,168 @@ export default function LandingClient() {
         </Container>
       </section>
 
-      {/* TRUST STRIP */}
-      <section className="border-y border-white/8 bg-slate-950/70 backdrop-blur">
-        <Container className="py-5">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80">
-              <IconCheck className="h-4 w-4 text-lime-300" />
-              Enkelt oppsett
-            </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80">
-              <IconCheck className="h-4 w-4 text-lime-300" />
-              Foreldre har full kontroll
-            </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80">
-              <IconCheck className="h-4 w-4 text-lime-300" />
-              Historikk og oversikt
-            </div>
+      {/* STATS */}
+      <section className="border-y border-border bg-background py-10">
+        <Container>
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            <StatCard value="1000+" label="Familier bruker appen" />
+            <StatCard value="50k+" label="Oppgaver fullfort" />
+            <StatCard value="500k kr" label="Utbetalt til barn" />
+            <StatCard value="4.9" label="App Store rating" />
           </div>
         </Container>
       </section>
 
-      {/* FEATURE 1 */}
-      <section className="bg-gradient-to-b from-emerald-950 to-slate-950">
-        <Container className="py-20 md:py-24">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            <SectionTitle
-              eyebrow="BARN"
-              title="Barn registrerer oppgaver"
-              desc="Barna velger oppgaver og sender inn krav. Du ser alt samlet, uten mas."
-            />
-            <div className="flex justify-center lg:justify-end">
-              <StaticPhone variant="tasks" />
-            </div>
-          </div>
-        </Container>
-      </section>
-      {/* FEATURE 2 */}
-      <section className="bg-gradient-to-b from-slate-950 to-emerald-900/90">
-        <Container className="py-20 md:py-24">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            <div className="order-2 flex justify-center lg:order-1 lg:justify-start">
-              <StaticPhone variant="inbox" />
-            </div>
-            <div className="order-1 lg:order-2">
-              <SectionTitle
-                eyebrow="FORELDER"
-                title="Du godkjenner på sekunder"
-                desc="Krav havner i innboksen. Godkjenn eller avvis med ett trykk."
-              />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* FEATURE 3 */}
-      <section className="bg-gradient-to-b from-emerald-900/90 to-slate-950">
-        <Container className="py-20 md:py-24">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            <SectionTitle
-              eyebrow="UTBETALING"
-              title="Utbetal når det passer"
-              desc="Marker utbetaling og hold historikken ryddig. Kontanter, Vipps eller bank."
-            />
-            <div className="flex justify-center lg:justify-end">
-              <StaticPhone variant="payout" />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* BENEFITS */}
-      <section id="benefits" className="scroll-mt-24 bg-slate-950">
-        <Container className="py-20 md:py-24">
-          <div className="max-w-2xl">
-            <SectionTitle
-              eyebrow="FORDELER"
-              title="Premium enkelhet for hele familien"
-              desc="Alt du trenger for ukepenger: oversikt, godkjenning og historikk."
-            />
+      {/* HOW IT WORKS */}
+      <section id="how" className="scroll-mt-20 bg-background py-16 md:py-24">
+        <Container>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              Slik funker det
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Tre enkle steg til bedre oversikt over ukepenger
+            </p>
           </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            <GlassCard>
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-lime-400/15 text-lime-200 ring-1 ring-lime-300/20">
-                  <IconCheck className="h-5 w-5" />
-                </span>
-                <div className="text-base font-semibold text-white">Kontroll og oversikt</div>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-white/70">
-                Se hva som er sendt, godkjent og utbetalt. Null rot.
-              </p>
-            </GlassCard>
-
-            <GlassCard>
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-lime-400/15 text-lime-200 ring-1 ring-lime-300/20">
-                  <IconCheck className="h-5 w-5" />
-                </span>
-                <div className="text-base font-semibold text-white">Mindre mas</div>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-white/70">
-                Barna sender krav i appen. Du godkjenner når det passer.
-              </p>
-            </GlassCard>
-
-            <GlassCard>
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-lime-400/15 text-lime-200 ring-1 ring-lime-300/20">
-                  <IconCheck className="h-5 w-5" />
-                </span>
-                <div className="text-base font-semibold text-white">Mobil-first</div>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-white/70">
-                Bygd for mobil. Store knapper. Rask flyt.
-              </p>
-            </GlassCard>
-          </div>
-        </Container>
-      </section>
-
-      {/* WISHLIST / EMOTIONAL */}
-      <section className="bg-gradient-to-b from-slate-950 to-emerald-950">
-        <Container className="py-20 md:py-24">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-            <SectionTitle
-              eyebrow="SPARING"
-              title="Spar til nø du ønsker deg"
-              desc="Onskeliste og sparemål gir barna motivasjon. Ukepenger får en tydelig mening."
-            />
-            <div className="flex justify-center lg:justify-end">
-              <StaticPhone variant="wishlist" />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* FAMILY */}
-      <section className="bg-slate-950">
-        <Container className="py-20 md:py-24">
-          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-            <div>
-              <SectionTitle
-                eyebrow="FAMILIE"
-                title="For familier som vil ha kontroll"
-                desc="En enkel app som gjor ukepenger ryddig. Bygd for hverdagen."
-              />
-              <div className="mt-8">
-                <GlassCard className="p-5">
-                  <div className="text-sm font-semibold text-white">Tipset som funker</div>
-                  <p className="mt-2 text-sm text-white/70">
-                    Start med 3-5 oppgaver, godkjenn på mobilen, og utbetal fast en gang i uka.
-                  </p>
-                </GlassCard>
-              </div>
-            </div>
-
-            <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-tr from-emerald-500/10 via-white/5 to-cyan-500/10 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.45)]">
-              <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
-              <div className="pointer-events-none absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                <div className="text-xs font-semibold tracking-[0.22em] text-lime-300/90">BILDEPLASSHOLDER</div>
-                <div className="mt-3 text-lg font-semibold text-white">Bytt inn et ekte familie-bilde</div>
-                <p className="mt-2 text-sm text-white/70">
-                  Ett ekte bilde er ofte nok for å få mer Greenlight-følelse.
-                </p>
-
-                <div className="mt-6 grid grid-cols-2 gap-3">
-                  <div className="h-28 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-transparent" />
-                  <div className="h-28 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-transparent" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* HOW */}
-      <section id="how" className="scroll-mt-24 bg-gradient-to-b from-emerald-950 to-slate-950">
-        <Container className="py-20 md:py-24">
-          <div className="max-w-2xl">
-            <SectionTitle
-              eyebrow="SLIK FUNKER DET"
-              title="Tre enkle steg"
-              desc="Hold flyten enkel: oppgaver, krav, godkjenning og utbetaling."
-            />
-          </div>
-
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
             {[
               {
-                n: "1",
-                t: "Velg oppgaver",
-                d: "Barna velger oppgaver og registrerer hva de har gjort.",
+                step: "1",
+                title: "Opprett oppgaver",
+                description: "Legg inn oppgaver med belonning. Rydde rom, gå tur, tomme oppvaskmaskinen - du bestemmer.",
               },
               {
-                n: "2",
-                t: "Barn sender krav",
-                d: "Krav sendes inn og havner i innboksen din.",
+                step: "2",
+                title: "Barn sender krav",
+                description: "Barna registrerer oppgavene de har gjort og sender inn krav direkte i appen.",
               },
               {
-                n: "3",
-                t: "Du godkjenner og utbetaler",
-                d: "Godkjenn på mobilen og marker utbetaling når det passer.",
+                step: "3",
+                title: "Du godkjenner",
+                description: "Se alle krav i innboksen din. Godkjenn med ett trykk og marker utbetaling når det passer.",
               },
             ].map((item) => (
-              <GlassCard key={item.n}>
-                <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-lime-400/15 text-lime-200 ring-1 ring-lime-300/20">
-                    <span className="text-base font-semibold">{item.n}</span>
-                  </div>
-                  <div>
-                    <div className="text-base font-semibold text-white">{item.t}</div>
-                    <p className="mt-2 text-sm leading-relaxed text-white/70">{item.d}</p>
-                  </div>
+              <div key={item.step} className="relative rounded-3xl bg-muted p-6">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-xl font-bold text-white">
+                  {item.step}
                 </div>
-              </GlassCard>
+                <h3 className="mt-4 text-xl font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+              </div>
             ))}
           </div>
         </Container>
       </section>
 
-      {/* FINAL CTA */}
-      <section className="bg-slate-950">
-        <Container className="py-16 md:py-20">
-          <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-slate-950 via-slate-950 to-emerald-950 p-8 shadow-[0_30px_90px_rgba(0,0,0,0.55)] md:p-12">
-            <div className="pointer-events-none absolute -top-24 right-10 h-72 w-72 rounded-full bg-lime-300/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 left-10 h-72 w-72 rounded-full bg-emerald-400/15 blur-3xl" />
-
-            <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
-              <div>
-                <div className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
-                  Kom i gang på 2 minutter
-                </div>
-                <div className="mt-2 text-sm text-white/70">Gratis å bruke.</div>
-              </div>
-
-              <PrimaryButtonLink href="/login" className="px-7 py-3 text-sm">
-                Kom i gang
-              </PrimaryButtonLink>
-            </div>
+      {/* FEATURES */}
+      <section id="features" className="scroll-mt-20 bg-muted py-16 md:py-24">
+        <Container>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              Alt du trenger for ukepenger
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Bygd for norske familier som vil ha kontroll og oversikt
+            </p>
           </div>
 
-          <div className="mt-10 text-center text-xs text-white/40">
-            Ukepenger - familieapp for oppgaver og ukepenger.
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <FeatureCard
+              icon={<IconTasks className="h-6 w-6" />}
+              title="Oppgaveliste"
+              description="Sett opp oppgaver med belonning. Barna velger og registrerer selv."
+            />
+            <FeatureCard
+              icon={<IconWallet className="h-6 w-6" />}
+              title="Enkel utbetaling"
+              description="Hold oversikt over hva som er til gode og marker utbetaling."
+            />
+            <FeatureCard
+              icon={<IconTarget className="h-6 w-6" />}
+              title="Sparemal"
+              description="Barna kan sette opp sparemal og se fremgangen mot det de onsker seg."
+            />
+            <FeatureCard
+              icon={<IconFamily className="h-6 w-6" />}
+              title="Hele familien"
+              description="Inviter alle barna og hold styr pa alles oppgaver og utbetalinger."
+            />
           </div>
         </Container>
       </section>
+
+      {/* TESTIMONIALS */}
+      <section id="testimonials" className="scroll-mt-20 bg-background py-16 md:py-24">
+        <Container>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              Norske familier elsker Ukepenger
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Se hva andre foreldre sier om appen
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <TestimonialCard
+              quote="Endelig en app som gjor ukepenger enkelt! Barna synes det er goy a registrere oppgaver, og jeg slipper a huske hva de har gjort."
+              name="Maria K."
+              role="Mamma til 3"
+            />
+            <TestimonialCard
+              quote="Barna laerer verdien av arbeid og penger pa en morsom mate. Sparemalet er genial - sjonnen sparer til ny fotball!"
+              name="Erik S."
+              role="Pappa til 2"
+            />
+            <TestimonialCard
+              quote="Mye mindre mas om penger na. Alt er oversiktlig i appen, og ungene tar mer ansvar for oppgavene sine."
+              name="Anne L."
+              role="Mamma til 2"
+            />
+          </div>
+        </Container>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-primary py-16 md:py-20">
+        <Container>
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+              Kom i gang pa 2 minutter
+            </h2>
+            <p className="mt-4 text-lg text-white/80">
+              Gratis a bruke. Ingen kredittkort nodvendig.
+            </p>
+            <div className="mt-8">
+              <PrimaryButton
+                href="/login"
+                className="bg-white text-primary hover:bg-white/90"
+              >
+                Start gratis na
+                <IconArrowRight className="ml-2 h-5 w-5" />
+              </PrimaryButton>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-border bg-background py-12">
+        <Container>
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <div className="flex items-center gap-2 font-bold text-lg text-foreground">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
+                <span className="h-2 w-2 rounded-full bg-white" />
+              </span>
+              Ukepenger
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Familie-appen for oppgaver og ukepenger
+            </div>
+          </div>
+        </Container>
+      </footer>
     </div>
   );
 }

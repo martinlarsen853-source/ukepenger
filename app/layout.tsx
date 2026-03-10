@@ -13,8 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SpareApp",
-  description: "Analyser bankutskrifter, få oversikt over forbruk og følg månedlig sparing.",
+  title: "Ukepenger - Familie-appen for oppgaver og ukepenger",
+  description: "Barn registrerer oppgaver, du godkjenner og betaler. Enkel og oversiktlig app for ukepenger til hele familien.",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -23,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="no">
+    <html lang="no" className="bg-background">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
