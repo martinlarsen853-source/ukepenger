@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 function cn(...parts: Array<string | undefined | null | false>) {
   return parts.filter(Boolean).join(" ");
@@ -74,13 +74,16 @@ function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl">
-      <Container className="flex h-14 items-center justify-between">
-        <Link href="/" className="text-lg font-semibold text-foreground">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <Container className="flex h-16 items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-foreground">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
+            <span className="text-sm font-bold text-accent-foreground">U</span>
+          </span>
           Ukepenger
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-10 md:flex">
           <Link href="#demo" className="text-sm text-muted-foreground hover:text-foreground transition">
             Demo
           </Link>
@@ -95,7 +98,7 @@ function Nav() {
           </Link>
           <Link
             href="/login"
-            className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-accent-foreground transition hover:bg-primary-dark"
+            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-accent-foreground transition hover:bg-primary-dark"
           >
             Kom i gang
           </Link>
@@ -103,11 +106,11 @@ function Nav() {
 
         <button
           type="button"
-          className="rounded-lg p-2 text-foreground md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground md:hidden"
           onClick={() => setOpen(true)}
           aria-label="Apne meny"
         >
-          <IconMenu className="h-5 w-5" />
+          <IconMenu className="h-6 w-6" />
         </button>
       </Container>
 
@@ -119,35 +122,40 @@ function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="flex h-14 items-center justify-between px-6">
-              <span className="text-lg font-semibold text-foreground">Ukepenger</span>
+            <div className="flex h-16 items-center justify-between px-6">
+              <span className="flex items-center gap-2 text-xl font-bold text-foreground">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
+                  <span className="text-sm font-bold text-accent-foreground">U</span>
+                </span>
+                Ukepenger
+              </span>
               <button
                 type="button"
-                className="rounded-lg p-2 text-foreground"
+                className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground"
                 onClick={() => setOpen(false)}
               >
-                <IconClose className="h-5 w-5" />
+                <IconClose className="h-6 w-6" />
               </button>
             </div>
 
             <nav className="mt-8 space-y-1 px-6">
               <Link
                 href="#demo"
-                className="block py-3 text-2xl font-medium text-foreground"
+                className="block py-4 text-2xl font-semibold text-foreground"
                 onClick={() => setOpen(false)}
               >
                 Demo
               </Link>
               <Link
                 href="#features"
-                className="block py-3 text-2xl font-medium text-foreground"
+                className="block py-4 text-2xl font-semibold text-foreground"
                 onClick={() => setOpen(false)}
               >
                 Funksjoner
               </Link>
               <Link
                 href="/login"
-                className="block py-3 text-2xl font-medium text-foreground"
+                className="block py-4 text-2xl font-semibold text-foreground"
                 onClick={() => setOpen(false)}
               >
                 Logg inn
@@ -157,7 +165,7 @@ function Nav() {
             <div className="absolute bottom-12 left-6 right-6">
               <Link
                 href="/login"
-                className="block w-full rounded-full bg-primary py-4 text-center text-base font-medium text-accent-foreground"
+                className="flex h-14 w-full items-center justify-center rounded-2xl bg-primary text-base font-semibold text-accent-foreground"
               >
                 Kom i gang
               </Link>
@@ -169,252 +177,688 @@ function Nav() {
   );
 }
 
-// Continuous video-style demo
+// Smooth cinematic phone demo with scene transitions
 function PhoneDemo() {
   const reduceMotion = useReducedMotion();
-  const [scrollY, setScrollY] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [currentScene, setCurrentScene] = useState(0);
+  
+  const scenes = [
+    "tasks",      // Child sees task list
+    "complete",   // Child completes tasks
+    "send",       // Child sends request
+    "parent",     // Parent sees inbox
+    "approve",    // Parent approves
+    "balance",    // Child sees updated balance
+  ];
 
-  // Auto-scroll animation
   useEffect(() => {
     if (reduceMotion) return;
-
-    const totalHeight = 1200; // Total scroll height of demo content
-    const duration = 12000; // 12 seconds per loop
-    let startTime: number | null = null;
-    let animationId: number;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = (elapsed % duration) / duration;
-      
-      // Smooth easing with pause at key points
-      const eased = smoothScrollEasing(progress);
-      setScrollY(eased * totalHeight);
-      
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animationId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationId);
-  }, [reduceMotion]);
-
-  // Custom easing that pauses at key screens
-  function smoothScrollEasing(t: number): number {
-    // Create pause points at 0.2, 0.5, 0.8
-    const pausePoints = [0.2, 0.5, 0.8];
-    const pauseDuration = 0.08;
     
-    for (const point of pausePoints) {
-      if (t >= point - pauseDuration / 2 && t <= point + pauseDuration / 2) {
-        return point;
-      }
-    }
+    const interval = setInterval(() => {
+      setCurrentScene((prev) => (prev + 1) % scenes.length);
+    }, 3000);
     
-    return t;
-  }
+    return () => clearInterval(interval);
+  }, [reduceMotion, scenes.length]);
 
   return (
-    <div className="relative mx-auto w-[280px] sm:w-[320px]">
+    <div className="relative mx-auto w-[300px] sm:w-[340px]">
       {/* Phone frame */}
-      <div className="relative rounded-[44px] bg-foreground/90 p-[10px] shadow-2xl shadow-black/40">
-        {/* Dynamic Island */}
-        <div className="absolute left-1/2 top-[18px] z-20 h-[28px] w-[90px] -translate-x-1/2 rounded-full bg-black" />
+      <div className="relative rounded-[52px] bg-gradient-to-b from-zinc-700 to-zinc-900 p-[12px] shadow-2xl shadow-black/50">
+        {/* Side buttons */}
+        <div className="absolute -left-[2px] top-[100px] h-8 w-[3px] rounded-l-sm bg-zinc-700" />
+        <div className="absolute -left-[2px] top-[150px] h-14 w-[3px] rounded-l-sm bg-zinc-700" />
+        <div className="absolute -left-[2px] top-[200px] h-14 w-[3px] rounded-l-sm bg-zinc-700" />
+        <div className="absolute -right-[2px] top-[140px] h-20 w-[3px] rounded-r-sm bg-zinc-700" />
         
-        {/* Screen */}
-        <div 
-          ref={containerRef}
-          className="relative h-[540px] overflow-hidden rounded-[34px] bg-background sm:h-[600px]"
-        >
-          {/* Scrolling content */}
-          <motion.div
-            className="absolute inset-x-0 top-0"
-            style={{ y: -scrollY }}
-          >
-            {/* Screen 1: Task list */}
-            <div className="min-h-[600px] p-5 pt-14">
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-foreground">Oppgaver</h3>
-                <p className="text-sm text-muted-foreground">Velg det du har gjort</p>
-              </div>
+        {/* Inner bezel */}
+        <div className="rounded-[40px] bg-black p-[2px]">
+          {/* Dynamic Island */}
+          <div className="absolute left-1/2 top-[22px] z-20 h-[32px] w-[100px] -translate-x-1/2 rounded-full bg-black" />
+          
+          {/* Screen */}
+          <div className="relative h-[580px] overflow-hidden rounded-[38px] bg-background sm:h-[640px]">
+            <AnimatePresence mode="wait">
+              {currentScene === 0 && (
+                <SceneTaskList key="tasks" />
+              )}
+              {currentScene === 1 && (
+                <SceneTasksComplete key="complete" />
+              )}
+              {currentScene === 2 && (
+                <SceneSendRequest key="send" />
+              )}
+              {currentScene === 3 && (
+                <SceneParentInbox key="parent" />
+              )}
+              {currentScene === 4 && (
+                <SceneApproved key="approve" />
+              )}
+              {currentScene === 5 && (
+                <SceneBalance key="balance" />
+              )}
+            </AnimatePresence>
 
-              <div className="space-y-3">
-                {[
-                  { task: "Rydde rommet", amount: 15, done: true },
-                  { task: "Tomme oppvaskmaskin", amount: 10, done: true },
-                  { task: "Ga tur med hunden", amount: 20, done: false },
-                  { task: "Stovsuging", amount: 25, done: false },
-                ].map((item, i) => (
-                  <motion.div
-                    key={i}
-                    className={cn(
-                      "flex items-center justify-between rounded-2xl p-4 transition-colors",
-                      item.done ? "bg-primary/10" : "bg-muted"
-                    )}
-                    initial={false}
-                    animate={{ 
-                      scale: item.done ? 1 : 1,
-                      backgroundColor: item.done ? "rgba(163, 230, 53, 0.1)" : "rgba(30, 41, 59, 1)"
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors",
-                        item.done ? "border-primary bg-primary" : "border-muted-foreground"
-                      )}>
-                        {item.done && <IconCheck className="h-4 w-4 text-accent-foreground" />}
-                      </div>
-                      <span className="text-sm font-medium text-foreground">{item.task}</span>
-                    </div>
-                    <span className="text-sm font-semibold text-primary">+{item.amount} kr</span>
-                  </motion.div>
-                ))}
-              </div>
-
-              <div className="mt-6 rounded-2xl bg-muted p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Totalt denne uka</span>
-                  <span className="text-lg font-bold text-foreground">25 kr</span>
+            {/* Status bar */}
+            <div className="absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-between px-8 pt-2">
+              <span className="text-xs font-semibold text-foreground">9:41</span>
+              <div className="flex items-center gap-1.5">
+                <div className="flex gap-0.5">
+                  <div className="h-2.5 w-1 rounded-sm bg-foreground" />
+                  <div className="h-2.5 w-1 rounded-sm bg-foreground" />
+                  <div className="h-2.5 w-1 rounded-sm bg-foreground/60" />
+                  <div className="h-2.5 w-1 rounded-sm bg-foreground/30" />
                 </div>
-              </div>
-
-              <button className="mt-6 w-full rounded-2xl bg-primary py-4 text-base font-semibold text-accent-foreground">
-                Send krav
-              </button>
-            </div>
-
-            {/* Screen 2: Pending approval */}
-            <div className="min-h-[600px] p-5 pt-14">
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-foreground">Krav sendt</h3>
-                <p className="text-sm text-muted-foreground">Venter pa godkjenning</p>
-              </div>
-
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/20">
-                  <motion.div
-                    className="h-12 w-12 rounded-full border-4 border-primary border-t-transparent"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  />
-                </div>
-                <p className="mt-6 text-center text-sm text-muted-foreground">
-                  Kravet ditt er sendt til godkjenning
-                </p>
-              </div>
-
-              <div className="mt-8 space-y-3">
-                <div className="rounded-2xl bg-muted p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Belop</span>
-                    <span className="font-semibold text-foreground">25 kr</span>
-                  </div>
-                </div>
-                <div className="rounded-2xl bg-muted p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Status</span>
-                    <span className="text-sm font-medium text-amber-400">Venter</span>
-                  </div>
+                <span className="text-xs text-foreground">5G</span>
+                <div className="flex h-3 w-6 items-center rounded-sm border border-foreground/50 px-0.5">
+                  <div className="h-1.5 w-3 rounded-sm bg-foreground" />
                 </div>
               </div>
             </div>
-
-            {/* Screen 3: Parent approval view */}
-            <div className="min-h-[600px] p-5 pt-14">
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-foreground">Innboks</h3>
-                <p className="text-sm text-muted-foreground">Krav som venter</p>
-              </div>
-
-              <div className="rounded-2xl bg-muted p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-accent-foreground">
-                    N
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-foreground">Noah</p>
-                    <p className="text-sm text-muted-foreground">2 oppgaver fullfort</p>
-                  </div>
-                  <span className="text-lg font-bold text-foreground">25 kr</span>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center justify-between rounded-xl bg-background/50 px-3 py-2">
-                    <span className="text-sm text-foreground">Rydde rommet</span>
-                    <span className="text-sm text-primary">+15 kr</span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-xl bg-background/50 px-3 py-2">
-                    <span className="text-sm text-foreground">Tomme oppvaskmaskin</span>
-                    <span className="text-sm text-primary">+10 kr</span>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex gap-3">
-                  <button className="flex-1 rounded-xl bg-primary py-3 text-sm font-semibold text-accent-foreground">
-                    Godkjenn
-                  </button>
-                  <button className="flex-1 rounded-xl bg-foreground/10 py-3 text-sm font-semibold text-foreground">
-                    Avvis
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Screen 4: Approved + balance */}
-            <div className="min-h-[600px] p-5 pt-14">
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold text-foreground">Saldo</h3>
-                <p className="text-sm text-muted-foreground">Noahs konto</p>
-              </div>
-
-              <div className="rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-6">
-                <p className="text-sm text-accent-foreground/70">Tilgjengelig</p>
-                <p className="mt-1 text-4xl font-bold text-accent-foreground">125 kr</p>
-              </div>
-
-              <div className="mt-6">
-                <p className="mb-3 text-sm font-medium text-muted-foreground">Siste aktivitet</p>
-                <div className="space-y-2">
-                  {[
-                    { text: "Ukepenger godkjent", amount: "+25 kr", time: "Na" },
-                    { text: "Handlet i kiosk", amount: "-30 kr", time: "I gar" },
-                    { text: "Ukepenger godkjent", amount: "+35 kr", time: "Forrige uke" },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center justify-between rounded-xl bg-muted px-4 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{item.text}</p>
-                        <p className="text-xs text-muted-foreground">{item.time}</p>
-                      </div>
-                      <span className={cn(
-                        "text-sm font-semibold",
-                        item.amount.startsWith("+") ? "text-primary" : "text-foreground"
-                      )}>
-                        {item.amount}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Gradient overlays for smooth transitions */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-background to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
+          </div>
         </div>
       </div>
 
-      {/* Reflection/glow effect */}
-      <div className="absolute -inset-4 -z-10 rounded-[60px] bg-primary/20 blur-3xl" />
+      {/* Glow effect */}
+      <div className="absolute -inset-8 -z-10 rounded-[80px] bg-primary/15 blur-3xl" />
+      
+      {/* Scene indicator */}
+      <div className="mt-8 flex justify-center gap-2">
+        {scenes.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentScene(i)}
+            className={cn(
+              "h-2 rounded-full transition-all duration-300",
+              i === currentScene ? "w-8 bg-primary" : "w-2 bg-muted-foreground/30"
+            )}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
-function FeatureItem(props: { title: string; description: string }) {
+// Scene components with smooth animations
+const sceneTransition = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+  transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+};
+
+function SceneTaskList() {
   return (
-    <div className="text-center">
-      <h3 className="text-lg font-semibold text-foreground">{props.title}</h3>
+    <motion.div {...sceneTransition} className="h-full p-5 pt-16">
+      {/* Profile header */}
+      <div className="flex items-center gap-3 rounded-2xl bg-card p-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20 text-2xl">
+          🐯
+        </div>
+        <div>
+          <p className="font-bold text-foreground">Evelina</p>
+          <p className="text-sm text-muted-foreground">Velg en oppgave og trykk send.</p>
+        </div>
+      </div>
+
+      {/* Balance card */}
+      <div className="mt-4 rounded-2xl bg-card p-4">
+        <p className="text-sm text-muted-foreground">Saldo totalt: <span className="font-bold text-foreground">25.00 kr</span></p>
+        <p className="text-xs text-muted-foreground">Venter: 0.00 kr • Til gode: 25.00 kr</p>
+      </div>
+
+      {/* Tasks */}
+      <div className="mt-4 space-y-3">
+        <TaskCard 
+          title="Lage mat" 
+          amount="2.00" 
+          gradient="from-blue-500 to-cyan-400"
+        />
+        <TaskCard 
+          title="OPPVASKMASKIN" 
+          amount="5.00" 
+          gradient="from-green-500 to-emerald-400"
+        />
+        <TaskCard 
+          title="Rydde av bordet" 
+          amount="2.00" 
+          gradient="from-orange-500 to-amber-400"
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+function TaskCard(props: { title: string; amount: string; gradient: string; selected?: boolean }) {
+  return (
+    <motion.div 
+      className={cn(
+        "rounded-2xl bg-gradient-to-br p-5",
+        props.gradient,
+        props.selected && "ring-2 ring-white ring-offset-2 ring-offset-background"
+      )}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <p className="font-bold text-white">{props.title}</p>
+      <p className="text-2xl font-bold text-white">{props.amount} kr</p>
+      <p className="mt-1 text-sm text-white/80">Trykk for aa sende krav</p>
+    </motion.div>
+  );
+}
+
+function SceneTasksComplete() {
+  return (
+    <motion.div {...sceneTransition} className="h-full p-5 pt-16">
+      <div className="flex items-center gap-3 rounded-2xl bg-card p-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20 text-2xl">
+          🐯
+        </div>
+        <div>
+          <p className="font-bold text-foreground">Evelina</p>
+          <p className="text-sm text-muted-foreground">2 oppgaver valgt</p>
+        </div>
+      </div>
+
+      <div className="mt-4 space-y-3">
+        <motion.div 
+          className="rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 p-5 ring-2 ring-primary ring-offset-2 ring-offset-background"
+          initial={{ scale: 1 }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-bold text-white">Lage mat</p>
+              <p className="text-2xl font-bold text-white">2.00 kr</p>
+            </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
+              <IconCheck className="h-5 w-5 text-blue-500" />
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="rounded-2xl bg-gradient-to-br from-green-500 to-emerald-400 p-5 ring-2 ring-primary ring-offset-2 ring-offset-background"
+          initial={{ scale: 1 }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-bold text-white">OPPVASKMASKIN</p>
+              <p className="text-2xl font-bold text-white">5.00 kr</p>
+            </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white">
+              <IconCheck className="h-5 w-5 text-green-500" />
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-card p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-muted-foreground">Totalt</span>
+          <span className="text-xl font-bold text-foreground">7.00 kr</span>
+        </div>
+      </div>
+
+      <motion.button 
+        className="mt-4 w-full rounded-2xl bg-primary py-4 text-base font-bold text-accent-foreground"
+        whileTap={{ scale: 0.98 }}
+      >
+        Send krav
+      </motion.button>
+    </motion.div>
+  );
+}
+
+function SceneSendRequest() {
+  return (
+    <motion.div {...sceneTransition} className="flex h-full flex-col items-center justify-center p-5 pt-16">
+      <motion.div 
+        className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/20"
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <IconCheck className="h-12 w-12 text-primary" />
+        </motion.div>
+      </motion.div>
+      
+      <motion.p 
+        className="mt-6 text-xl font-bold text-foreground"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        Krav sendt!
+      </motion.p>
+      <motion.p 
+        className="mt-2 text-center text-muted-foreground"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        Venter pa at mamma eller pappa godkjenner
+      </motion.p>
+
+      <motion.div 
+        className="mt-8 w-full max-w-[200px] rounded-2xl bg-card p-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+      >
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Belop</span>
+          <span className="font-bold text-primary">7.00 kr</span>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function SceneParentInbox() {
+  return (
+    <motion.div {...sceneTransition} className="h-full p-5 pt-16">
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground">Foreldervisning</p>
+        <h3 className="text-2xl font-bold text-foreground">Innboks</h3>
+      </div>
+
+      <motion.div 
+        className="rounded-2xl bg-card p-5"
+        initial={{ x: 50, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/20 text-2xl">
+            🐯
+          </div>
+          <div className="flex-1">
+            <p className="text-lg font-bold text-foreground">Evelina</p>
+            <p className="text-sm text-muted-foreground">2 oppgaver fullfort</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xl font-bold text-primary">7.00 kr</p>
+            <p className="text-xs text-muted-foreground">Nettopp</p>
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-2">
+          <div className="flex items-center justify-between rounded-xl bg-background/50 px-4 py-3">
+            <span className="text-sm text-foreground">Lage mat</span>
+            <span className="text-sm font-medium text-primary">+2.00 kr</span>
+          </div>
+          <div className="flex items-center justify-between rounded-xl bg-background/50 px-4 py-3">
+            <span className="text-sm text-foreground">Oppvaskmaskin</span>
+            <span className="text-sm font-medium text-primary">+5.00 kr</span>
+          </div>
+        </div>
+
+        <div className="mt-5 flex gap-3">
+          <motion.button 
+            className="flex-1 rounded-xl bg-primary py-3.5 text-sm font-bold text-accent-foreground"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Godkjenn
+          </motion.button>
+          <button className="flex-1 rounded-xl bg-muted py-3.5 text-sm font-semibold text-muted-foreground">
+            Avvis
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function SceneApproved() {
+  return (
+    <motion.div {...sceneTransition} className="flex h-full flex-col items-center justify-center p-5 pt-16">
+      <motion.div 
+        className="flex h-28 w-28 items-center justify-center rounded-full bg-primary"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <IconCheck className="h-14 w-14 text-accent-foreground" />
+        </motion.div>
+      </motion.div>
+      
+      <motion.p 
+        className="mt-6 text-2xl font-bold text-foreground"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        Godkjent!
+      </motion.p>
+      <motion.p 
+        className="mt-2 text-center text-muted-foreground"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        7.00 kr er lagt til Evelinas saldo
+      </motion.p>
+
+      <motion.div
+        className="mt-8 flex items-center gap-3"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/20 text-lg">
+          🐯
+        </div>
+        <div className="rounded-2xl bg-card px-4 py-2">
+          <p className="text-sm text-foreground">Ny saldo: <span className="font-bold text-primary">32.00 kr</span></p>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function SceneBalance() {
+  return (
+    <motion.div {...sceneTransition} className="h-full p-5 pt-16">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20 text-2xl">
+          🐯
+        </div>
+        <div>
+          <p className="font-bold text-foreground">Evelina</p>
+          <p className="text-sm text-muted-foreground">Din oversikt</p>
+        </div>
+      </div>
+
+      <motion.div 
+        className="mt-6 rounded-3xl bg-gradient-to-br from-primary via-primary to-emerald-500 p-6"
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <p className="text-sm text-accent-foreground/80">Tilgjengelig saldo</p>
+        <motion.p 
+          className="mt-1 text-4xl font-bold text-accent-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          32.00 kr
+        </motion.p>
+      </motion.div>
+
+      <div className="mt-6">
+        <p className="mb-3 text-sm font-medium text-muted-foreground">Siste aktivitet</p>
+        <div className="space-y-2">
+          <motion.div 
+            className="flex items-center justify-between rounded-xl bg-card px-4 py-3"
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div>
+              <p className="text-sm font-medium text-foreground">Oppgaver godkjent</p>
+              <p className="text-xs text-muted-foreground">Nettopp</p>
+            </div>
+            <span className="font-bold text-primary">+7.00 kr</span>
+          </motion.div>
+          <motion.div 
+            className="flex items-center justify-between rounded-xl bg-card px-4 py-3"
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div>
+              <p className="text-sm font-medium text-foreground">Ukepenger</p>
+              <p className="text-xs text-muted-foreground">Forrige uke</p>
+            </div>
+            <span className="font-bold text-primary">+25.00 kr</span>
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// QR Code Setup Demo - iPad and iPhone side by side
+function QRSetupDemo() {
+  const [step, setStep] = useState(0);
+  const reduceMotion = useReducedMotion();
+  
+  useEffect(() => {
+    if (reduceMotion) return;
+    
+    const interval = setInterval(() => {
+      setStep((prev) => (prev + 1) % 4);
+    }, 2500);
+    
+    return () => clearInterval(interval);
+  }, [reduceMotion]);
+
+  return (
+    <div className="relative flex flex-col items-center gap-8 lg:flex-row lg:justify-center lg:gap-16">
+      {/* Parent Phone */}
+      <div className="relative">
+        <div className="rounded-[36px] bg-gradient-to-b from-zinc-700 to-zinc-900 p-[8px] shadow-xl">
+          <div className="rounded-[28px] bg-black p-[2px]">
+            <div className="relative h-[320px] w-[150px] overflow-hidden rounded-[26px] bg-background sm:h-[380px] sm:w-[180px]">
+              {/* Status bar */}
+              <div className="flex h-8 items-center justify-between px-4 pt-1">
+                <span className="text-[10px] font-semibold text-foreground">9:41</span>
+                <div className="h-4 w-12 rounded-full bg-black" />
+                <span className="text-[10px] text-foreground">100%</span>
+              </div>
+              
+              <div className="p-4 pt-2">
+                <p className="text-xs text-muted-foreground">Forelder</p>
+                <p className="text-sm font-bold text-foreground">Legg til barn</p>
+                
+                <motion.div 
+                  className="mt-4 flex aspect-square items-center justify-center rounded-2xl bg-white p-3"
+                  animate={step >= 1 ? { scale: [1, 1.05, 1] } : {}}
+                  transition={{ duration: 0.5 }}
+                >
+                  {/* QR Code SVG */}
+                  <svg viewBox="0 0 100 100" className="h-full w-full">
+                    <rect fill="black" x="10" y="10" width="25" height="25" />
+                    <rect fill="black" x="65" y="10" width="25" height="25" />
+                    <rect fill="black" x="10" y="65" width="25" height="25" />
+                    <rect fill="white" x="15" y="15" width="15" height="15" />
+                    <rect fill="white" x="70" y="15" width="15" height="15" />
+                    <rect fill="white" x="15" y="70" width="15" height="15" />
+                    <rect fill="black" x="18" y="18" width="9" height="9" />
+                    <rect fill="black" x="73" y="18" width="9" height="9" />
+                    <rect fill="black" x="18" y="73" width="9" height="9" />
+                    <rect fill="black" x="40" y="10" width="5" height="5" />
+                    <rect fill="black" x="50" y="10" width="5" height="5" />
+                    <rect fill="black" x="40" y="20" width="5" height="5" />
+                    <rect fill="black" x="45" y="25" width="5" height="5" />
+                    <rect fill="black" x="40" y="40" width="20" height="5" />
+                    <rect fill="black" x="40" y="50" width="5" height="5" />
+                    <rect fill="black" x="50" y="45" width="5" height="5" />
+                    <rect fill="black" x="55" y="55" width="5" height="5" />
+                    <rect fill="black" x="65" y="40" width="5" height="5" />
+                    <rect fill="black" x="70" y="45" width="5" height="5" />
+                    <rect fill="black" x="80" y="40" width="10" height="5" />
+                    <rect fill="black" x="65" y="55" width="25" height="5" />
+                    <rect fill="black" x="65" y="65" width="5" height="25" />
+                    <rect fill="black" x="75" y="70" width="5" height="5" />
+                    <rect fill="black" x="85" y="65" width="5" height="5" />
+                    <rect fill="black" x="80" y="80" width="10" height="10" />
+                    <rect fill="black" x="10" y="40" width="5" height="5" />
+                    <rect fill="black" x="20" y="45" width="5" height="5" />
+                    <rect fill="black" x="10" y="50" width="15" height="5" />
+                    <rect fill="black" x="40" y="65" width="5" height="5" />
+                    <rect fill="black" x="45" y="75" width="10" height="5" />
+                    <rect fill="black" x="40" y="85" width="5" height="5" />
+                  </svg>
+                </motion.div>
+                
+                <p className="mt-3 text-center text-[10px] text-muted-foreground">
+                  La barnet skanne denne koden
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="mt-4 text-center text-sm font-medium text-muted-foreground">Mamma/Pappa</p>
+      </div>
+
+      {/* Connection animation */}
+      <motion.div 
+        className="hidden lg:block"
+        animate={step >= 1 && step < 3 ? { opacity: [0.3, 1, 0.3] } : { opacity: 0.3 }}
+        transition={{ duration: 1.5, repeat: step >= 1 && step < 3 ? Infinity : 0 }}
+      >
+        <svg width="80" height="40" viewBox="0 0 80 40">
+          <path 
+            d="M0 20 Q40 0 80 20" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeDasharray="4 4"
+            fill="none"
+            className="text-primary"
+          />
+          <motion.circle
+            cx="40"
+            cy="10"
+            r="4"
+            fill="currentColor"
+            className="text-primary"
+            animate={step >= 1 && step < 3 ? { 
+              cx: [0, 80],
+              cy: [20, 20]
+            } : {}}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+        </svg>
+      </motion.div>
+
+      {/* Child iPad */}
+      <div className="relative">
+        <div className="rounded-[28px] bg-gradient-to-b from-zinc-700 to-zinc-900 p-[8px] shadow-xl">
+          <div className="rounded-[20px] bg-black p-[2px]">
+            <div className="relative h-[280px] w-[200px] overflow-hidden rounded-[18px] bg-background sm:h-[320px] sm:w-[240px]">
+              {/* Camera */}
+              <div className="absolute top-3 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-zinc-700" />
+              
+              <AnimatePresence mode="wait">
+                {step < 2 && (
+                  <motion.div 
+                    key="camera"
+                    className="flex h-full flex-col items-center justify-center p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div className="relative h-32 w-32 rounded-2xl border-4 border-dashed border-primary/50 sm:h-40 sm:w-40">
+                      <motion.div
+                        className="absolute inset-2 rounded-xl border-2 border-primary"
+                        animate={{ scale: [1, 1.05, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      />
+                      <motion.div
+                        className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-primary/50"
+                        animate={{ y: [-60, 60] }}
+                        transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
+                      />
+                    </div>
+                    <p className="mt-4 text-center text-xs text-muted-foreground">
+                      Skann QR-koden
+                    </p>
+                  </motion.div>
+                )}
+                
+                {step >= 2 && step < 3 && (
+                  <motion.div 
+                    key="scanning"
+                    className="flex h-full flex-col items-center justify-center p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <motion.div 
+                      className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/20"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <motion.div
+                        className="h-10 w-10 rounded-full border-4 border-primary border-t-transparent"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      />
+                    </motion.div>
+                    <p className="mt-4 text-center text-xs text-muted-foreground">
+                      Kobler til...
+                    </p>
+                  </motion.div>
+                )}
+                
+                {step >= 3 && (
+                  <motion.div 
+                    key="connected"
+                    className="flex h-full flex-col items-center justify-center p-4"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                  >
+                    <motion.div 
+                      className="flex h-20 w-20 items-center justify-center rounded-full bg-primary"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                    >
+                      <IconCheck className="h-10 w-10 text-accent-foreground" />
+                    </motion.div>
+                    <motion.p 
+                      className="mt-4 text-center text-sm font-bold text-foreground"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      Koblet til!
+                    </motion.p>
+                    <motion.div
+                      className="mt-4 flex items-center gap-2 rounded-full bg-card px-4 py-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <span className="text-lg">🐯</span>
+                      <span className="text-sm font-medium text-foreground">Evelina</span>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+        <p className="mt-4 text-center text-sm font-medium text-muted-foreground">Barnets iPad</p>
+      </div>
+    </div>
+  );
+}
+
+function FeatureCard(props: { icon: React.ReactNode; title: string; description: string }) {
+  return (
+    <div className="rounded-3xl bg-card p-6 sm:p-8">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        {props.icon}
+      </div>
+      <h3 className="mt-5 text-lg font-bold text-foreground">{props.title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{props.description}</p>
     </div>
   );
@@ -426,75 +870,156 @@ export default function LandingClient() {
       <Nav />
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32">
+      <section className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24">
         <Container>
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              <span className="block text-balance">Ukepenger.</span>
-              <span className="block text-balance text-primary">Enkelt for hele familien.</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Barn registrerer oppgaver. Du godkjenner og betaler. Alt pa ett sted.
-            </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
+            <motion.h1 
+              className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="block text-balance">Ukepenger for</span>
+              <span className="block text-balance text-primary">hele familien.</span>
+            </motion.h1>
+            <motion.p 
+              className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              Barn registrerer oppgaver. Foreldre godkjenner. Alt pa ett sted.
+            </motion.p>
+            <motion.div 
+              className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-base font-semibold text-accent-foreground transition hover:bg-primary-dark"
+                className="inline-flex h-14 items-center justify-center rounded-2xl bg-primary px-8 text-base font-semibold text-accent-foreground transition hover:bg-primary-dark"
               >
-                Kom i gang
+                Kom i gang gratis
                 <IconArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
                 href="#demo"
-                className="inline-flex items-center justify-center rounded-full border border-border px-8 py-4 text-base font-semibold text-foreground transition hover:bg-muted"
+                className="inline-flex h-14 items-center justify-center rounded-2xl border border-border px-8 text-base font-semibold text-foreground transition hover:bg-card"
               >
                 Se demo
               </Link>
-            </div>
+            </motion.div>
           </div>
         </Container>
       </section>
 
-      {/* Demo section */}
-      <section id="demo" className="scroll-mt-20 py-20 md:py-32">
+      {/* Phone Demo Section */}
+      <section id="demo" className="scroll-mt-20 py-16 sm:py-24">
         <Container>
           <div className="mx-auto max-w-xl text-center">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               Se hvordan det fungerer
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Fra oppgave til godkjenning pa sekunder
+              Fra oppgave til godkjenning pa sekunder.
             </p>
           </div>
 
-          <div className="mt-16">
+          <div className="mt-12 sm:mt-16">
             <PhoneDemo />
           </div>
         </Container>
       </section>
 
-      {/* Features - minimal */}
-      <section id="features" className="scroll-mt-20 border-t border-border py-20 md:py-32">
+      {/* QR Setup Section */}
+      <section className="border-t border-border py-16 sm:py-24">
         <Container>
-          <div className="grid gap-12 md:grid-cols-3 md:gap-8">
-            <FeatureItem
+          <div className="mx-auto max-w-xl text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              Enkel oppsett med QR-kode
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Barnet skanner koden - ferdig pa sekunder.
+            </p>
+          </div>
+
+          <div className="mt-12 sm:mt-16">
+            <QRSetupDemo />
+          </div>
+        </Container>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="scroll-mt-20 border-t border-border py-16 sm:py-24">
+        <Container>
+          <div className="mx-auto max-w-xl text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              Alt du trenger
+            </h2>
+          </div>
+
+          <div className="mt-12 grid gap-4 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
+            <FeatureCard
+              icon={
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              }
               title="Oppgaveliste"
-              description="Sett opp oppgaver med belonning. Barna velger og registrerer selv hva de har gjort."
+              description="Definer oppgaver med belonning. Barna velger og registrerer selv hva de har gjort."
             />
-            <FeatureItem
+            <FeatureCard
+              icon={
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
               title="Enkel godkjenning"
               description="Se alle krav i innboksen. Godkjenn med ett trykk nar oppgavene er gjort."
             />
-            <FeatureItem
+            <FeatureCard
+              icon={
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
               title="Full oversikt"
               description="Hold styr pa saldo, utbetalinger og sparemal for alle barna."
+            />
+            <FeatureCard
+              icon={
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              }
+              title="Flere barn"
+              description="Legg til sa mange barn du vil. Hver med sin egen profil og saldo."
+            />
+            <FeatureCard
+              icon={
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              }
+              title="Fungerer overalt"
+              description="Mobil, nettbrett eller PC. Appen tilpasser seg enheten."
+            />
+            <FeatureCard
+              icon={
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              }
+              title="Trygt og sikkert"
+              description="All data er kryptert. Kun familien har tilgang."
             />
           </div>
         </Container>
       </section>
 
       {/* CTA */}
-      <section className="border-t border-border py-20 md:py-32">
+      <section className="border-t border-border py-16 sm:py-24">
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -506,7 +1031,7 @@ export default function LandingClient() {
             <div className="mt-10">
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-base font-semibold text-accent-foreground transition hover:bg-primary-dark"
+                className="inline-flex h-14 items-center justify-center rounded-2xl bg-primary px-8 text-base font-semibold text-accent-foreground transition hover:bg-primary-dark"
               >
                 Start gratis
                 <IconArrowRight className="ml-2 h-5 w-5" />
@@ -516,12 +1041,19 @@ export default function LandingClient() {
         </Container>
       </section>
 
-      {/* Footer - minimal */}
-      <footer className="border-t border-border py-8">
+      {/* Footer */}
+      <footer className="border-t border-border py-10">
         <Container>
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <span className="text-sm text-muted-foreground">Ukepenger</span>
-            <span className="text-sm text-muted-foreground">Familie-appen for oppgaver og ukepenger</span>
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
+                <span className="text-xs font-bold text-accent-foreground">U</span>
+              </span>
+              <span className="font-semibold">Ukepenger</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Laget for norske familier
+            </p>
           </div>
         </Container>
       </footer>
