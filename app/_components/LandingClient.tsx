@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 function cn(...parts: Array<string | undefined | null | false>) {
   return parts.filter(Boolean).join(" ");
@@ -72,36 +72,6 @@ function IconCheck(props: { className?: string }) {
 
 function Nav() {
   const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const firstMenuLinkRef = useRef<HTMLAnchorElement>(null);
-  const mobileMenuId = "mobile-menu-panel";
-
-  useEffect(() => {
-    if (!open) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    const focusFrame = window.requestAnimationFrame(() => {
-      firstMenuLinkRef.current?.focus();
-    });
-
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      window.cancelAnimationFrame(focusFrame);
-      document.body.style.overflow = previousOverflow;
-      triggerRef.current?.focus();
-    };
-  }, [open]);
-
-  const closeMenu = () => setOpen(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -132,30 +102,22 @@ function Nav() {
         </div>
 
         <button
-          ref={triggerRef}
           type="button"
           className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground md:hidden"
-          onClick={() => setOpen((prev) => !prev)}
-          aria-label={open ? "Lukk meny" : "Åpne meny"}
-          aria-expanded={open}
-          aria-controls={mobileMenuId}
+          onClick={() => setOpen(true)}
+          aria-label="Apne meny"
         >
-          {open ? <IconClose className="h-6 w-6" /> : <IconMenu className="h-6 w-6" />}
+          <IconMenu className="h-6 w-6" />
         </button>
       </Container>
 
-      <AnimatePresence initial={false}>
+      <AnimatePresence>
         {open && (
           <motion.div
-            id={mobileMenuId}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobilmeny"
             className="fixed inset-0 z-50 bg-background md:hidden"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.24, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
             <div className="flex h-16 items-center justify-between px-6">
               <span className="flex items-center gap-2 text-xl font-bold text-foreground">
@@ -167,8 +129,7 @@ function Nav() {
               <button
                 type="button"
                 className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground"
-                onClick={closeMenu}
-                aria-label="Lukk meny"
+                onClick={() => setOpen(false)}
               >
                 <IconClose className="h-6 w-6" />
               </button>
@@ -176,17 +137,16 @@ function Nav() {
 
             <nav className="mt-8 space-y-1 px-6">
               <Link
-                ref={firstMenuLinkRef}
                 href="#features"
                 className="block py-4 text-2xl font-semibold text-foreground"
-                onClick={closeMenu}
+                onClick={() => setOpen(false)}
               >
                 Funksjoner
               </Link>
               <Link
                 href="/login"
                 className="block py-4 text-2xl font-semibold text-foreground"
-                onClick={closeMenu}
+                onClick={() => setOpen(false)}
               >
                 Logg inn
               </Link>
@@ -196,7 +156,6 @@ function Nav() {
               <Link
                 href="/login"
                 className="flex h-14 w-full items-center justify-center rounded-2xl bg-primary text-base font-semibold text-accent-foreground"
-                onClick={closeMenu}
               >
                 Kom i gang
               </Link>
@@ -480,7 +439,7 @@ function SceneSendRequest() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        Venter på at mamma eller pappa godkjenner
+        Venter pa at mamma eller pappa godkjenner
       </motion.p>
 
       <motion.div 
@@ -490,7 +449,7 @@ function SceneSendRequest() {
         transition={{ delay: 0.6 }}
       >
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Beløp</span>
+          <span className="text-sm text-muted-foreground">Belop</span>
           <span className="font-bold text-primary">7.00 kr</span>
         </div>
       </motion.div>
@@ -678,7 +637,7 @@ function SceneWishlist() {
         </div>
         <div>
           <p className="font-bold text-foreground">Evelina</p>
-          <p className="text-sm text-muted-foreground">Min ønskeliste</p>
+          <p className="text-sm text-muted-foreground">Min onskeliste</p>
         </div>
       </div>
 
@@ -756,7 +715,7 @@ function SceneWishlist() {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        + Legg til nytt ønske
+        + Legg til nytt onske
       </motion.button>
     </motion.div>
   );
@@ -1016,7 +975,7 @@ export default function LandingClient() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Barn registrerer oppgaver. Foreldre godkjenner. Alt på ett sted.
+              Barn registrerer oppgaver. Foreldre godkjenner. Alt pa ett sted.
             </motion.p>
             <motion.div 
               className="mt-10"
@@ -1044,7 +1003,7 @@ export default function LandingClient() {
               Se hvordan det fungerer
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Fra oppgave til godkjenning på sekunder.
+              Fra oppgave til godkjenning pa sekunder.
             </p>
           </div>
 
@@ -1062,7 +1021,7 @@ export default function LandingClient() {
               Enkel oppsett med QR-kode
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Barnet skanner koden - ferdig på sekunder.
+              Barnet skanner koden - ferdig pa sekunder.
             </p>
           </div>
 
@@ -1089,7 +1048,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Oppgaveliste"
-              description="Definer oppgaver med belønning. Barna velger og registrerer selv hva de har gjort."
+              description="Definer oppgaver med belonning. Barna velger og registrerer selv hva de har gjort."
             />
             <FeatureCard
               icon={
@@ -1098,7 +1057,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Enkel godkjenning"
-              description="Se alle krav i innboksen. Godkjenn med ett trykk når oppgavene er gjort."
+              description="Se alle krav i innboksen. Godkjenn med ett trykk nar oppgavene er gjort."
             />
             <FeatureCard
               icon={
@@ -1107,7 +1066,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Full oversikt"
-              description="Hold styr på saldo, utbetalinger og sparemål for alle barna."
+              description="Hold styr pa saldo, utbetalinger og sparemal for alle barna."
             />
             <FeatureCard
               icon={
@@ -1116,7 +1075,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Flere barn"
-              description="Legg til så mange barn du vil. Hver med sin egen profil og saldo."
+              description="Legg til sa mange barn du vil. Hver med sin egen profil og saldo."
             />
             <FeatureCard
               icon={
@@ -1145,10 +1104,10 @@ export default function LandingClient() {
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Klar til å komme i gang?
+              Klar til a komme i gang?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Gratis å bruke. Ingen kredittkort nødvendig.
+              Gratis a bruke. Ingen kredittkort nodvendig.
             </p>
             <div className="mt-10">
               <Link
