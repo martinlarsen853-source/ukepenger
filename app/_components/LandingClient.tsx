@@ -1003,7 +1003,7 @@ export default function LandingClient() {
               Se hvordan det fungerer
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Fra oppgave til godkjenning pa sekunder.
+              Fra oppgave til godkjenning på sekunder.
             </p>
           </div>
 
