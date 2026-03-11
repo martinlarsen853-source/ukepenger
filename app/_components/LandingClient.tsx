@@ -237,12 +237,6 @@ function PhoneDemo() {
             <div className="absolute inset-x-0 top-0 z-10 flex h-12 items-center justify-between px-8 pt-2">
               <span className="text-xs font-semibold text-foreground">9:41</span>
               <div className="flex items-center gap-1.5">
-                <div className="flex gap-0.5">
-                  <div className="h-2.5 w-1 rounded-sm bg-foreground" />
-                  <div className="h-2.5 w-1 rounded-sm bg-foreground" />
-                  <div className="h-2.5 w-1 rounded-sm bg-foreground/60" />
-                  <div className="h-2.5 w-1 rounded-sm bg-foreground/30" />
-                </div>
                 <span className="text-xs text-foreground">5G</span>
                 <div className="flex h-3 w-6 items-center rounded-sm border border-foreground/50 px-0.5">
                   <div className="h-1.5 w-3 rounded-sm bg-foreground" />
