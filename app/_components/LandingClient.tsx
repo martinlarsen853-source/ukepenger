@@ -731,10 +731,10 @@ function QRSetupDemo() {
   }, [reduceMotion]);
 
   return (
-    <div className="relative flex flex-col items-center gap-8 lg:flex-row lg:justify-center lg:gap-16">
+    <div className="relative flex flex-row items-center justify-center gap-3 sm:gap-5 lg:flex-row lg:justify-center lg:gap-16">
       {/* Parent Phone */}
       <div className="relative">
-        <div className="rounded-[36px] bg-gradient-to-b from-zinc-700 to-zinc-900 p-[8px] shadow-xl">
+        <div className="origin-top scale-[0.85] rounded-[36px] bg-gradient-to-b from-zinc-700 to-zinc-900 p-[8px] shadow-xl sm:scale-[0.9] lg:scale-100">
           <div className="rounded-[28px] bg-black p-[2px]">
             <div className="relative h-[320px] w-[150px] overflow-hidden rounded-[26px] bg-background sm:h-[380px] sm:w-[180px]">
               {/* Status bar */}
@@ -831,7 +831,7 @@ function QRSetupDemo() {
 
       {/* Child iPad */}
       <div className="relative">
-        <div className="rounded-[28px] bg-gradient-to-b from-zinc-700 to-zinc-900 p-[8px] shadow-xl">
+        <div className="origin-top scale-[0.85] rounded-[28px] bg-gradient-to-b from-zinc-700 to-zinc-900 p-[8px] shadow-xl sm:scale-[0.9] lg:scale-100">
           <div className="rounded-[20px] bg-black p-[2px]">
             <div className="relative h-[280px] w-[200px] overflow-hidden rounded-[18px] bg-background sm:h-[320px] sm:w-[240px]">
               {/* Camera */}
