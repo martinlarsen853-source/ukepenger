@@ -105,7 +105,7 @@ function Nav() {
           type="button"
           className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground md:hidden"
           onClick={() => setOpen(true)}
-          aria-label="Apne meny"
+          aria-label="Åpne meny"
         >
           <IconMenu className="h-6 w-6" />
         </button>
@@ -336,7 +336,7 @@ function TaskCard(props: { title: string; amount: string; gradient: string; sele
     >
       <p className="font-bold text-white">{props.title}</p>
       <p className="text-2xl font-bold text-white">{props.amount} kr</p>
-      <p className="mt-1 text-sm text-white/80">Trykk for aa sende krav</p>
+      <p className="mt-1 text-sm text-white/80">Trykk for å sende krav</p>
     </motion.div>
   );
 }
@@ -439,7 +439,7 @@ function SceneSendRequest() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        Venter pa at mamma eller pappa godkjenner
+        Venter på at mamma eller pappa godkjenner
       </motion.p>
 
       <motion.div 
@@ -449,7 +449,7 @@ function SceneSendRequest() {
         transition={{ delay: 0.6 }}
       >
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Belop</span>
+          <span className="text-sm text-muted-foreground">Beløp</span>
           <span className="font-bold text-primary">7.00 kr</span>
         </div>
       </motion.div>
@@ -477,7 +477,7 @@ function SceneParentInbox() {
           </div>
           <div className="flex-1">
             <p className="text-lg font-bold text-foreground">Evelina</p>
-            <p className="text-sm text-muted-foreground">2 oppgaver fullfort</p>
+            <p className="text-sm text-muted-foreground">2 oppgaver fullført</p>
           </div>
           <div className="text-right">
             <p className="text-xl font-bold text-primary">7.00 kr</p>
@@ -637,7 +637,7 @@ function SceneWishlist() {
         </div>
         <div>
           <p className="font-bold text-foreground">Evelina</p>
-          <p className="text-sm text-muted-foreground">Min onskeliste</p>
+          <p className="text-sm text-muted-foreground">Min ønskeliste</p>
         </div>
       </div>
 
@@ -715,7 +715,7 @@ function SceneWishlist() {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        + Legg til nytt onske
+        + Legg til nytt ønske
       </motion.button>
     </motion.div>
   );
@@ -975,7 +975,7 @@ export default function LandingClient() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
             >
-              Barn registrerer oppgaver. Foreldre godkjenner. Alt pa ett sted.
+              Barn registrerer oppgaver. Foreldre godkjenner. Alt på ett sted.
             </motion.p>
             <motion.div 
               className="mt-10"
@@ -1021,7 +1021,7 @@ export default function LandingClient() {
               Enkel oppsett med QR-kode
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Barnet skanner koden - ferdig pa sekunder.
+              Barnet skanner koden - ferdig på sekunder.
             </p>
           </div>
 
@@ -1048,7 +1048,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Oppgaveliste"
-              description="Definer oppgaver med belonning. Barna velger og registrerer selv hva de har gjort."
+              description="Definer oppgaver med belønning. Barna velger og registrerer selv hva de har gjort."
             />
             <FeatureCard
               icon={
@@ -1057,7 +1057,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Enkel godkjenning"
-              description="Se alle krav i innboksen. Godkjenn med ett trykk nar oppgavene er gjort."
+              description="Se alle krav i innboksen. Godkjenn med ett trykk når oppgavene er gjort."
             />
             <FeatureCard
               icon={
@@ -1066,7 +1066,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Full oversikt"
-              description="Hold styr pa saldo, utbetalinger og sparemal for alle barna."
+              description="Hold styr på saldo, utbetalinger og sparemål for alle barna."
             />
             <FeatureCard
               icon={
@@ -1075,7 +1075,7 @@ export default function LandingClient() {
                 </svg>
               }
               title="Flere barn"
-              description="Legg til sa mange barn du vil. Hver med sin egen profil og saldo."
+              description="Legg til så mange barn du vil. Hver med sin egen profil og saldo."
             />
             <FeatureCard
               icon={
@@ -1104,10 +1104,10 @@ export default function LandingClient() {
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Klar til a komme i gang?
+              Klar til å komme i gang?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Gratis a bruke. Ingen kredittkort nodvendig.
+              Gratis å bruke. Ingen kredittkort nødvendig.
             </p>
             <div className="mt-10">
               <Link
