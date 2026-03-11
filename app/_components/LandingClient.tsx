@@ -284,7 +284,7 @@ function SceneTaskList() {
           🐯
         </div>
         <div>
-          <p className="font-bold text-foreground">Evelina</p>
+          <p className="font-bold text-foreground">Sofie</p>
           <p className="text-sm text-muted-foreground">Velg en oppgave og trykk send.</p>
         </div>
       </div>
@@ -343,7 +343,7 @@ function SceneTasksComplete() {
           🐯
         </div>
         <div>
-          <p className="font-bold text-foreground">Evelina</p>
+          <p className="font-bold text-foreground">Sofie</p>
           <p className="text-sm text-muted-foreground">2 oppgaver valgt</p>
         </div>
       </div>
@@ -470,7 +470,7 @@ function SceneParentInbox() {
             🐯
           </div>
           <div className="flex-1">
-            <p className="text-lg font-bold text-foreground">Evelina</p>
+            <p className="text-lg font-bold text-foreground">Sofie</p>
             <p className="text-sm text-muted-foreground">2 oppgaver fullført</p>
           </div>
           <div className="text-right">
@@ -539,7 +539,7 @@ function SceneApproved() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        7.00 kr er lagt til Evelinas saldo
+        7.00 kr er lagt til Sofies saldo
       </motion.p>
 
       <motion.div
@@ -567,7 +567,7 @@ function SceneBalance() {
           🐯
         </div>
         <div>
-          <p className="font-bold text-foreground">Evelina</p>
+          <p className="font-bold text-foreground">Sofie</p>
           <p className="text-sm text-muted-foreground">Din oversikt</p>
         </div>
       </div>
@@ -630,7 +630,7 @@ function SceneWishlist() {
           🐯
         </div>
         <div>
-          <p className="font-bold text-foreground">Evelina</p>
+          <p className="font-bold text-foreground">Sofie</p>
           <p className="text-sm text-muted-foreground">Min ønskeliste</p>
         </div>
       </div>
@@ -919,7 +919,7 @@ function QRSetupDemo() {
                       transition={{ delay: 0.4 }}
                     >
                       <span className="text-lg">🐯</span>
-                      <span className="text-sm font-medium text-foreground">Evelina</span>
+                      <span className="text-sm font-medium text-foreground">Sofie</span>
                     </motion.div>
                   </motion.div>
                 )}
