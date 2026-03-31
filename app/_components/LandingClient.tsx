@@ -87,7 +87,12 @@ function Nav() {
   }, [open]);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
+    <header
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl",
+        open && "z-[120] bg-background backdrop-blur-none"
+      )}
+    >
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-foreground">
           <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
@@ -127,52 +132,52 @@ function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed top-0 left-0 right-0 bottom-0 z-[100] h-full w-full overflow-y-auto bg-background md:hidden"
+            className="fixed inset-0 z-[130] h-screen w-screen overflow-y-auto bg-background md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <div className="flex min-h-screen flex-col bg-background">
-              <div className="border-b border-border px-6">
-                <div className="flex h-16 items-center justify-between">
-                  <span className="flex items-center gap-2 text-xl font-bold text-foreground">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-                      <span className="text-sm font-bold text-accent-foreground">U</span>
-                    </span>
-                    Ukepenger
+              <div className="flex h-16 items-center justify-between border-b border-border px-6">
+                <span className="flex items-center gap-2 text-xl font-bold text-foreground">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
+                    <span className="text-sm font-bold text-accent-foreground">U</span>
                   </span>
-                  <button
-                    type="button"
-                    className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground"
-                    onClick={() => setOpen(false)}
-                  >
-                    <IconClose className="h-6 w-6" />
-                  </button>
-                </div>
+                  Ukepenger
+                </span>
+                <button
+                  type="button"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground"
+                  onClick={() => setOpen(false)}
+                  aria-label="Lukk meny"
+                >
+                  <IconClose className="h-6 w-6" />
+                </button>
               </div>
 
-              <div className="flex flex-1 flex-col px-6 pt-6 pb-12">
-                <nav className="rounded-3xl border border-border bg-card px-5 py-4 shadow-2xl shadow-black/20">
+              <div className="flex flex-1 flex-col px-6 pb-8 pt-8">
+                <nav className="space-y-1">
                   <Link
                     href="#features"
-                    className="block rounded-2xl px-4 py-4 text-2xl font-semibold text-foreground"
+                    className="block rounded-2xl border border-border bg-card px-5 py-4 text-2xl font-semibold text-foreground"
                     onClick={() => setOpen(false)}
                   >
                     Funksjoner
                   </Link>
                   <Link
                     href="/login"
-                    className="mt-2 block rounded-2xl px-4 py-4 text-2xl font-semibold text-foreground"
+                    className="block rounded-2xl border border-border bg-card px-5 py-4 text-2xl font-semibold text-foreground"
                     onClick={() => setOpen(false)}
                   >
                     Logg inn
                   </Link>
                 </nav>
 
-                <div className="mt-auto pt-8">
+                <div className="mt-auto pt-10">
                   <Link
                     href="/login"
                     className="flex h-14 w-full items-center justify-center rounded-2xl bg-primary text-base font-semibold text-accent-foreground"
+                    onClick={() => setOpen(false)}
                   >
                     Kom i gang
                   </Link>
