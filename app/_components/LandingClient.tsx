@@ -73,6 +73,19 @@ function IconCheck(props: { className?: string }) {
 function Nav() {
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    if (!open) return;
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+
+    body.style.overflow = "hidden";
+
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
       <Container className="flex h-16 items-center justify-between">
@@ -114,7 +127,7 @@ function Nav() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed inset-0 z-50 bg-background md:hidden"
+            className="fixed top-0 left-0 right-0 bottom-0 z-[100] h-full w-full overflow-y-auto bg-background md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
