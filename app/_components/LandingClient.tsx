@@ -132,46 +132,52 @@ function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="flex h-16 items-center justify-between px-6">
-              <span className="flex items-center gap-2 text-xl font-bold text-foreground">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-                  <span className="text-sm font-bold text-accent-foreground">U</span>
-                </span>
-                Ukepenger
-              </span>
-              <button
-                type="button"
-                className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground"
-                onClick={() => setOpen(false)}
-              >
-                <IconClose className="h-6 w-6" />
-              </button>
-            </div>
+            <div className="flex min-h-screen flex-col bg-background">
+              <div className="border-b border-border px-6">
+                <div className="flex h-16 items-center justify-between">
+                  <span className="flex items-center gap-2 text-xl font-bold text-foreground">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
+                      <span className="text-sm font-bold text-accent-foreground">U</span>
+                    </span>
+                    Ukepenger
+                  </span>
+                  <button
+                    type="button"
+                    className="flex h-11 w-11 items-center justify-center rounded-xl text-foreground"
+                    onClick={() => setOpen(false)}
+                  >
+                    <IconClose className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
 
-            <nav className="mt-8 space-y-1 px-6">
-              <Link
-                href="#features"
-                className="block py-4 text-2xl font-semibold text-foreground"
-                onClick={() => setOpen(false)}
-              >
-                Funksjoner
-              </Link>
-              <Link
-                href="/login"
-                className="block py-4 text-2xl font-semibold text-foreground"
-                onClick={() => setOpen(false)}
-              >
-                Logg inn
-              </Link>
-            </nav>
+              <div className="flex flex-1 flex-col px-6 pt-6 pb-12">
+                <nav className="rounded-3xl border border-border bg-card px-5 py-4 shadow-2xl shadow-black/20">
+                  <Link
+                    href="#features"
+                    className="block rounded-2xl px-4 py-4 text-2xl font-semibold text-foreground"
+                    onClick={() => setOpen(false)}
+                  >
+                    Funksjoner
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="mt-2 block rounded-2xl px-4 py-4 text-2xl font-semibold text-foreground"
+                    onClick={() => setOpen(false)}
+                  >
+                    Logg inn
+                  </Link>
+                </nav>
 
-            <div className="absolute bottom-12 left-6 right-6">
-              <Link
-                href="/login"
-                className="flex h-14 w-full items-center justify-center rounded-2xl bg-primary text-base font-semibold text-accent-foreground"
-              >
-                Kom i gang
-              </Link>
+                <div className="mt-auto pt-8">
+                  <Link
+                    href="/login"
+                    className="flex h-14 w-full items-center justify-center rounded-2xl bg-primary text-base font-semibold text-accent-foreground"
+                  >
+                    Kom i gang
+                  </Link>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
