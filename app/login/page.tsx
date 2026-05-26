@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ensureFamilyForUser, getAdminSetupStatus } from "@/lib/family-client";
 import { supabase } from "@/lib/supabaseClient";
 
-type AuthAction = "login" | "signup" | "google" | "apple" | "resend" | null;
+type AuthAction = "login" | "signup" | "google" | "resend" | null;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -188,14 +188,6 @@ export default function LoginPage() {
             className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {action === "google" ? "Sender til Google..." : "Fortsett med Google"}
-          </button>
-          <button
-            type="button"
-            onClick={() => void handleOAuth("apple")}
-            disabled={isLoading}
-            className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {action === "apple" ? "Sender til Apple..." : "Fortsett med Apple"}
           </button>
         </div>
 
