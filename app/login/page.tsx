@@ -109,7 +109,7 @@ export default function LoginPage() {
     setAction(null);
   };
 
-  const handleOAuth = async (provider: "google" | "apple") => {
+  const handleOAuth = async (provider: "google") => {
     setStatus("");
     setAction(provider);
     const redirectTo = `${window.location.origin}/auth/callback`;
