@@ -12,7 +12,7 @@ function wait(ms: number) {
 function AuthCallbackInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState("Fullforer innlogging...");
+  const [status, setStatus] = useState("Fullfører innlogging...");
 
   useEffect(() => {
     let mounted = true;
@@ -26,7 +26,7 @@ function AuthCallbackInner() {
         if (mounted) {
           const msg = errorDescription ?? errorParam;
           if (msg.toLowerCase().includes("expired")) {
-            setStatus("Lenken har utlopt. Gaa tilbake til innlogging og be om en ny.");
+            setStatus("Lenken har utløpt. Gå tilbake til innlogging og be om en ny.");
           } else {
             setStatus(`Feil: ${msg}`);
           }
@@ -70,7 +70,7 @@ function AuthCallbackInner() {
       }
 
       if (mounted) {
-        setStatus("Fant ikke aktiv sesjon. Lenken kan vaere utlopt – prov aa logge inn pa nytt.");
+        setStatus("Fant ikke aktiv sesjon. Lenken kan være utløpt – prøv å logge inn på nytt.");
       }
     };
 
@@ -81,7 +81,7 @@ function AuthCallbackInner() {
     };
   }, [router, searchParams]);
 
-  const isError = status.startsWith("Feil:") || status.includes("utlopt") || status.includes("Fant ikke");
+  const isError = status.startsWith("Feil:") || status.includes("utløpt") || status.includes("Fant ikke");
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-slate-100">
@@ -117,7 +117,7 @@ export default function AuthCallbackPage() {
             <div className="mb-4 flex justify-center">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-600 border-t-slate-200" />
             </div>
-            <p className="text-sm text-slate-300">Fullforer innlogging...</p>
+            <p className="text-sm text-slate-300">Fullfører innlogging...</p>
           </div>
         </main>
       }

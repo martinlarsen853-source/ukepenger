@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -136,8 +136,9 @@ export default function LoginPage() {
           <div className="mb-4 text-3xl">📬</div>
           <h1 className="mb-2 text-2xl font-semibold tracking-tight">Sjekk e-posten din</h1>
           <p className="text-sm text-slate-300">
-            Vi har sendt en bekreftelseslenke til <span className="font-medium text-slate-100">{email}</span>.
-            Klikk lenken for aa aktivere kontoen din.
+            Vi har sendt en bekreftelseslenke til{" "}
+            <span className="font-medium text-slate-100">{email}</span>.
+            Klikk lenken for å aktivere kontoen din.
           </p>
           <div className="mt-4 rounded-lg border border-amber-800 bg-amber-950/30 px-3 py-2.5 text-sm text-amber-200">
             Finner du ikke e-posten? Sjekk <strong>søppelpost / spam</strong> – den kan havne der.
@@ -149,7 +150,7 @@ export default function LoginPage() {
               disabled={action === "resend"}
               className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {action === "resend" ? "Sender..." : "Send e-post paa nytt"}
+              {action === "resend" ? "Sender..." : "Send e-post på nytt"}
             </button>
             <button
               type="button"
@@ -177,7 +178,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100">
       <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl shadow-black/20 md:p-7">
         <h1 className="mb-1 text-2xl font-semibold tracking-tight">Logg inn</h1>
-        <p className="mb-6 text-sm text-slate-400">E-post/passord eller OAuth for aa aaapne admin.</p>
+        <p className="mb-6 text-sm text-slate-400">E-post/passord eller OAuth for å åpne admin.</p>
 
         <div className="space-y-3">
           <button
@@ -204,55 +205,68 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-slate-800" />
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-300">
-              E-post
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
-              placeholder="navn@epost.no"
-            />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (canSubmit) void handleLogin();
+          }}
+          noValidate
+        >
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-300">
+                E-post
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                inputMode="email"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
+                placeholder="navn@epost.no"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-300">
+                Passord
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                enterKeyHint="go"
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
+                placeholder="Skriv passord"
+              />
+            </div>
           </div>
 
-          <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-300">
-              Passord
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-slate-100 outline-none transition placeholder:text-slate-500 focus:border-slate-500"
-              placeholder="Skriv passord"
-            />
+          <div className="mt-6 space-y-3">
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className="w-full rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {action === "login" ? "Logger inn..." : "Logg inn"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => void handleSignUp()}
+              disabled={!canSubmit}
+              className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {action === "signup" ? "Oppretter konto..." : "Opprett konto"}
+            </button>
           </div>
-        </div>
-
-        <div className="mt-6 space-y-3">
-          <button
-            type="button"
-            onClick={() => void handleLogin()}
-            disabled={!canSubmit}
-            className="w-full rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {action === "login" ? "Logger inn..." : "Logg inn"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => void handleSignUp()}
-            disabled={!canSubmit}
-            className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {action === "signup" ? "Oppretter konto..." : "Opprett konto"}
-          </button>
-        </div>
+        </form>
 
         <div className="mt-4 min-h-5">
           {status && (
