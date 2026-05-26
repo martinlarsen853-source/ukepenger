@@ -54,6 +54,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: profileRes.error?.message ?? "Fant ikke admin-profil." }, { status: 403 });
   }
 
+  if (profileRes.data.role !== "ADMIN") {
+    return NextResponse.json({ error: "Kun admin kan registrere utbetalinger." }, { status: 403 });
+  }
+
   const adminFamilyId = profileRes.data.family_id as string;
 
   const body = (await request.json()) as {

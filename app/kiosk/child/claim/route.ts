@@ -27,8 +27,8 @@ type DeviceRow = {
   revoked_at: string | null;
 };
 
-function redirectKiosk(error: string) {
-  return NextResponse.redirect(`https://www.ukepenger.no/kiosk?claim_error=${encodeURIComponent(error)}`, { status: 303 });
+function redirectKiosk(error: string, origin: string) {
+  return NextResponse.redirect(`${origin}/kiosk?claim_error=${encodeURIComponent(error)}`, { status: 303 });
 }
 
 async function generateUniqueDeviceCode(supabase: NonNullable<ReturnType<typeof getServiceSupabaseClient>>) {
@@ -41,18 +41,19 @@ async function generateUniqueDeviceCode(supabase: NonNullable<ReturnType<typeof 
 }
 
 export async function GET(request: Request) {
+  const origin = new URL(request.url).origin;
   try {
     const url = new URL(request.url);
     const code = (url.searchParams.get("code") ?? "").trim();
     const secret = (url.searchParams.get("secret") ?? "").trim();
 
     if (!code || !secret) {
-      return redirectKiosk("missing_params");
+      return redirectKiosk("missing_params", origin);
     }
 
     const supabase = getServiceSupabaseClient();
     if (!supabase) {
-      return redirectKiosk("server_error");
+      return redirectKiosk("server_error", origin);
     }
 
     const secretHash = await hashToken(secret);
@@ -66,7 +67,7 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (qrRes.error || !qrRes.data) {
-      return redirectKiosk("invalid_child_qr");
+      return redirectKiosk("invalid_child_qr", origin);
     }
 
     const qr = qrRes.data as ChildQrRow;
@@ -77,7 +78,7 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (childRes.error || !childRes.data) {
-      return redirectKiosk("invalid_child_qr");
+      return redirectKiosk("invalid_child_qr", origin);
     }
 
     const child = childRes.data as ChildRow;
@@ -118,13 +119,13 @@ export async function GET(request: Request) {
         .maybeSingle();
 
       if (deviceRes.error) {
-        return redirectKiosk("server_error");
+        return redirectKiosk("server_error", origin);
       }
 
       if (!deviceRes.data) {
         const newCode = await generateUniqueDeviceCode(supabase);
         if (!newCode) {
-          return redirectKiosk("server_error");
+          return redirectKiosk("server_error", origin);
         }
 
         const newSecret = await generateDeviceSecret(48);
@@ -147,7 +148,7 @@ export async function GET(request: Request) {
           .single();
 
         if (insertRes.error || !insertRes.data) {
-          return redirectKiosk("server_error");
+          return redirectKiosk("server_error", origin);
         }
 
         deviceRes = { ...deviceRes, data: insertRes.data, error: null };
@@ -155,13 +156,14 @@ export async function GET(request: Request) {
 
       const device = deviceRes.data as DeviceRow;
       if (!device.device_secret) {
-        return redirectKiosk("invalid_device");
+        return redirectKiosk("invalid_device", origin);
       }
 
       kioskValue = getKioskCookieValue(device.id, device.device_secret);
     }
 
-    const response = NextResponse.redirect("https://www.ukepenger.no/kids", { status: 303 });
+    const isProduction = origin.includes("ukepenger.no");
+    const response = NextResponse.redirect(`${origin}/kids`, { status: 303 });
     response.cookies.set({
       name: KIOSK_COOKIE_NAME,
       value: kioskValue,
@@ -169,7 +171,7 @@ export async function GET(request: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      domain: "ukepenger.no",
+      ...(isProduction && { domain: "ukepenger.no" }),
       maxAge: 31536000,
     });
     response.cookies.set({
@@ -179,11 +181,11 @@ export async function GET(request: Request) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      domain: "ukepenger.no",
+      ...(isProduction && { domain: "ukepenger.no" }),
       maxAge: 31536000,
     });
     return response;
   } catch {
-    return redirectKiosk("server_error");
+    return redirectKiosk("server_error", origin);
   }
 }

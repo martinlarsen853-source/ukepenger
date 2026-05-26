@@ -49,6 +49,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: profileRes.error?.message ?? "Fant ikke admin-profil." }, { status: 403 });
   }
 
+  if (profileRes.data.role !== "ADMIN") {
+    return NextResponse.json({ error: "Kun admin kan slette utbetalinger." }, { status: 403 });
+  }
+
   const adminFamilyId = profileRes.data.family_id as string;
 
   let body: { paymentId?: string } = {};
@@ -98,7 +102,7 @@ export async function POST(request: Request) {
   if (claimIds.length > 0) {
     const revertRes = await serviceClient
       .from("claims")
-      .update({ status: "REJECTED", paid_at: null })
+      .update({ status: "APPROVED", paid_at: null })
       .in("id", claimIds);
 
     if (revertRes.error) {
