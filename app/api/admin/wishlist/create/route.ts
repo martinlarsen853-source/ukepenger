@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Mangler childId eller title." }, { status: 400 });
   }
   if (!Number.isInteger(targetOre) || targetOre <= 0) {
-    return NextResponse.json({ error: "targetOre ma vaere et positivt heltall." }, { status: 400 });
+    return NextResponse.json({ error: "targetOre må være et positivt heltall." }, { status: 400 });
   }
 
   const childRes = await serviceClient
@@ -91,7 +91,7 @@ export async function POST(request: Request) {
 
   const child = childRes.data as ChildRow;
   if (child.family_id !== profile.family_id) {
-    return NextResponse.json({ error: "Barnet tilhorer ikke din familie." }, { status: 403 });
+    return NextResponse.json({ error: "Barnet tilhører ikke din familie." }, { status: 403 });
   }
 
   const insertRes = await serviceClient
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
     .single();
 
   if (insertRes.error || !insertRes.data) {
-    return NextResponse.json({ error: insertRes.error?.message ?? "Kunne ikke lagre onskeliste-item." }, { status: 400 });
+    return NextResponse.json({ error: insertRes.error?.message ?? "Kunne ikke lagre ønskeliste-item." }, { status: 400 });
   }
 
   return NextResponse.json({ ok: true });

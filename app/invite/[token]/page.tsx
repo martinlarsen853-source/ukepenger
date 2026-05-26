@@ -47,12 +47,12 @@ export default async function InvitePage({ params }: PageProps) {
       <main className="mx-auto max-w-lg px-4 py-10 text-slate-100">
         <section className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6">
           <h1 className="text-xl font-semibold">Invitasjon</h1>
-          <p>Logg inn for aa akseptere invitasjonen.</p>
+          <p>Logg inn for å akseptere invitasjonen.</p>
           <Link
             href={`/login?next=${encodeURIComponent(`/invite/${token}`)}`}
             className="inline-flex rounded-lg border border-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
           >
-            Ga til login
+            Gå til login
           </Link>
         </section>
       </main>
@@ -92,7 +92,7 @@ export default async function InvitePage({ params }: PageProps) {
   } else if (invite.accepted_at) {
     message = "Invitasjonen er allerede akseptert.";
   } else if (new Date(invite.expires_at).getTime() <= Date.now()) {
-    message = "Invitasjonen er utlopet.";
+    message = "Invitasjonen er utløpt.";
   } else if (!userEmail || userEmail !== inviteEmail) {
     message = `Du er logget inn som ${user.email ?? "ukjent"}, men invitasjonen er for ${invite.email}.`;
   }

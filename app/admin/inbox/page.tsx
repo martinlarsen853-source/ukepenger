@@ -84,7 +84,7 @@ export default function AdminInboxPage() {
       const ctx = await getCurrentAdminContext();
       if (!ctx.user || !ctx.familyId) {
         setLoading(false);
-        setStatus("Logg inn for a se krav.");
+        setStatus("Logg inn for å se krav.");
         return;
       }
       setFamilyId(ctx.familyId);
@@ -131,7 +131,7 @@ export default function AdminInboxPage() {
           href="/admin/payments"
           className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
         >
-          Ga til utbetalinger
+          Gå til utbetalinger
         </Link>
       </div>
 
@@ -154,7 +154,7 @@ export default function AdminInboxPage() {
             <div className="space-y-1 text-sm">
               <p><span className="font-semibold">Barn:</span> {getChildName(item)}</p>
               <p><span className="font-semibold">Oppgave:</span> {getTaskTitle(item)}</p>
-              <p><span className="font-semibold">Belop:</span> {formatKr(item.amount_ore)}</p>
+              <p><span className="font-semibold">Beløp:</span> {formatKr(item.amount_ore)}</p>
               <p><span className="font-semibold">Tid:</span> {new Date(item.created_at).toLocaleString("nb-NO")}</p>
             </div>
             <div className="mt-4 flex gap-2">
@@ -184,7 +184,7 @@ export default function AdminInboxPage() {
               <tr>
                 <th className="px-4 py-3">Barn</th>
                 <th className="px-4 py-3">Oppgave</th>
-                <th className="px-4 py-3">Belop</th>
+                <th className="px-4 py-3">Beløp</th>
                 <th className="px-4 py-3">Tid</th>
                 <th className="px-4 py-3">Handling</th>
               </tr>

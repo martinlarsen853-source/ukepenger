@@ -94,7 +94,7 @@ export default function AdminChildTaskSettingsPage() {
     if (!accessToken) {
       setWishlistItems([]);
       setWishlistLoading(false);
-      setWishlistStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      setWishlistStatus("Feil: Mangler innloggingstoken. Logg inn på nytt.");
       return;
     }
 
@@ -109,7 +109,7 @@ export default function AdminChildTaskSettingsPage() {
 
     if (!response.ok || payload.error) {
       setWishlistItems([]);
-      setWishlistStatus(`Feil: ${payload.error ?? "Kunne ikke hente onskeliste."}`);
+      setWishlistStatus(`Feil: ${payload.error ?? "Kunne ikke hente ønskeliste."}`);
       return;
     }
 
@@ -163,14 +163,14 @@ export default function AdminChildTaskSettingsPage() {
       return;
     }
     if (!Number.isInteger(targetOre) || targetOre <= 0) {
-      setWishlistStatus("Feil: Skriv gyldig belop i kr.");
+      setWishlistStatus("Feil: Skriv gyldig beløp i kr.");
       return;
     }
 
     const sessionRes = await supabase.auth.getSession();
     const accessToken = sessionRes.data.session?.access_token;
     if (!accessToken) {
-      setWishlistStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      setWishlistStatus("Feil: Mangler innloggingstoken. Logg inn på nytt.");
       return;
     }
 
@@ -192,14 +192,14 @@ export default function AdminChildTaskSettingsPage() {
     setWishlistSaving(false);
 
     if (!response.ok || payload.error) {
-      setWishlistStatus(`Feil: ${payload.error ?? "Kunne ikke lagre onskeliste-item."}`);
+      setWishlistStatus(`Feil: ${payload.error ?? "Kunne ikke lagre ønskeliste-item."}`);
       return;
     }
 
     setWishlistTitle("");
     setWishlistTargetKr("");
     setWishlistNote("");
-    setWishlistStatus("Onskeliste-item lagt til.");
+    setWishlistStatus("Ønskeliste-item lagt til.");
     await loadWishlist();
   };
 
@@ -237,8 +237,8 @@ export default function AdminChildTaskSettingsPage() {
 
       <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 md:p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-base font-semibold tracking-tight">Onskeliste</h3>
-          <span className="text-xs text-slate-500">MVP: legg til nye onsker</span>
+          <h3 className="text-base font-semibold tracking-tight">Ønskeliste</h3>
+          <span className="text-xs text-slate-500">MVP: legg til nye ønsker</span>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           <label className="space-y-1.5">
@@ -251,7 +251,7 @@ export default function AdminChildTaskSettingsPage() {
             />
           </label>
           <label className="space-y-1.5">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Belop (kr)</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Beløp (kr)</span>
             <input
               value={wishlistTargetKr}
               onChange={(e) => setWishlistTargetKr(e.target.value)}
@@ -293,11 +293,11 @@ export default function AdminChildTaskSettingsPage() {
         )}
 
         <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950 p-3">
-          <h4 className="text-sm font-semibold text-slate-100">Eksisterende onsker</h4>
+          <h4 className="text-sm font-semibold text-slate-100">Eksisterende ønsker</h4>
           {wishlistLoading ? (
             <p className="mt-2 text-sm text-slate-400">Laster...</p>
           ) : wishlistItems.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-400">Ingen onskeliste enda.</p>
+            <p className="mt-2 text-sm text-slate-400">Ingen ønskeliste enda.</p>
           ) : (
             <div className="mt-2 space-y-2">
               {wishlistItems.map((item) => (

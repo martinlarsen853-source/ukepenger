@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invitasjonen er allerede akseptert." }, { status: 400 });
   }
   if (new Date(invite.expires_at).getTime() <= Date.now()) {
-    return NextResponse.json({ error: "Invitasjonen er utlopet." }, { status: 400 });
+    return NextResponse.json({ error: "Invitasjonen er utløpt." }, { status: 400 });
   }
   if (invite.email.toLowerCase() !== user.email.toLowerCase()) {
     return NextResponse.json({ error: "Invitasjonen matcher ikke innlogget e-post." }, { status: 403 });
