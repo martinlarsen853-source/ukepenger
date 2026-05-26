@@ -202,9 +202,9 @@ export default function KidTaskPage() {
           </div>
 
           <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950 p-3">
-            <h2 className="text-sm font-semibold text-slate-100">Onskeliste</h2>
+            <h2 className="text-sm font-semibold text-slate-100">Ønskeliste</h2>
             {wishlistItems.length === 0 ? (
-              <p className="mt-2 text-sm text-slate-400">Ingen onskeliste enda.</p>
+              <p className="mt-2 text-sm text-slate-400">Ingen ønskeliste enda.</p>
             ) : (
               <div className="mt-2 space-y-2">
                 {wishlistItems.map((item) => {
@@ -213,7 +213,7 @@ export default function KidTaskPage() {
                     <div key={item.id} className="rounded-lg border border-slate-800 bg-slate-900 p-3">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-                        <span className="text-xs text-slate-300">Maal: {formatKr(item.target_ore)}</span>
+                        <span className="text-xs text-slate-300">Mål: {formatKr(item.target_ore)}</span>
                       </div>
                       <p className="mt-1 text-xs text-slate-400">Mangler {formatKr(missingOre)}</p>
                       {item.note && <p className="mt-1 text-xs text-slate-500">{item.note}</p>}
@@ -236,7 +236,7 @@ export default function KidTaskPage() {
             <span>{status}</span>
             {showLoginLink && (
               <Link href="/login" className="ml-2 inline-flex text-slate-100 underline underline-offset-4">
-                Gaa til login
+                Gå til login
               </Link>
             )}
           </p>
@@ -260,7 +260,7 @@ export default function KidTaskPage() {
                 <div className="text-2xl font-black tracking-tight">{task.title}</div>
                 <div className="mt-2 text-3xl font-black">{formatKr(task.amount_ore)}</div>
                 <div className="mt-4 text-sm font-semibold text-slate-900/80">
-                  {justSubmitted ? "Sendt!" : disabled ? `Vent ${secondsLeft}s` : "Trykk for aa sende krav"}
+                  {justSubmitted ? "Sendt!" : disabled ? `Vent ${secondsLeft}s` : "Trykk for å sende krav"}
                 </div>
                 {disabled && (
                   <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/50">

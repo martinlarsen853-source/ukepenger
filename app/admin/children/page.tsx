@@ -235,7 +235,7 @@ export default function AdminChildrenPage() {
           </button>
         </div>
         {visibleChildren.length === 0 ? (
-          <div className="text-sm text-slate-400">Ingen barn a vise.</div>
+          <div className="text-sm text-slate-400">Ingen barn å vise.</div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {visibleChildren.map((child) => {
@@ -340,7 +340,7 @@ export default function AdminChildrenPage() {
             {visibleChildren.length === 0 && (
               <tr>
                 <td className="px-4 py-10 text-center text-slate-400" colSpan={4}>
-                  Ingen barn enda. Legg til forste barn over.
+                  Ingen barn enda. Legg til første barn over.
                 </td>
               </tr>
             )}

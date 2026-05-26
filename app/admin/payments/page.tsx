@@ -238,7 +238,7 @@ export default function AdminPaymentsPage() {
 
     if (!accessToken) {
       setSubmitting(false);
-      setStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      setStatus("Feil: Mangler innloggingstoken. Logg inn på nytt.");
       return;
     }
 
@@ -285,7 +285,7 @@ export default function AdminPaymentsPage() {
       setStatus("Ingen til gode å utbetale.");
       return;
     }
-    if (!window.confirm(`Er du sikker pa at du vil utbetale ${formatKr(allTotal)} til ${selectedChildName}?`)) {
+    if (!window.confirm(`Er du sikker på at du vil utbetale ${formatKr(allTotal)} til ${selectedChildName}?`)) {
       return;
     }
 
@@ -297,7 +297,7 @@ export default function AdminPaymentsPage() {
 
     if (!accessToken) {
       setSubmitting(false);
-      setStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      setStatus("Feil: Mangler innloggingstoken. Logg inn på nytt.");
       return;
     }
 
@@ -332,7 +332,7 @@ export default function AdminPaymentsPage() {
 
   const deletePayment = async (paymentId: string) => {
     const confirmed = window.confirm(
-      "Er du sikker pa at du vil slette denne utbetalingen? Kravene blir satt tilbake til APPROVED."
+      "Er du sikker på at du vil slette denne utbetalingen? Kravene blir satt tilbake til APPROVED."
     );
     if (!confirmed) return;
 
@@ -342,7 +342,7 @@ export default function AdminPaymentsPage() {
     const accessToken = sessionRes.data.session?.access_token;
 
     if (!accessToken) {
-      setStatus("Feil: Mangler innloggingstoken. Logg inn pa nytt.");
+      setStatus("Feil: Mangler innloggingstoken. Logg inn på nytt.");
       return;
     }
 
@@ -428,7 +428,7 @@ export default function AdminPaymentsPage() {
               <th className="px-4 py-3">Velg</th>
               <th className="px-4 py-3">Barn</th>
               <th className="px-4 py-3">Oppgave</th>
-              <th className="px-4 py-3">Belop</th>
+              <th className="px-4 py-3">Beløp</th>
               <th className="px-4 py-3">Tid</th>
             </tr>
           </thead>

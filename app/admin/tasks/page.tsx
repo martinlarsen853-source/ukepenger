@@ -66,7 +66,7 @@ export default function AdminTasksPage() {
 
     const parsedAmount = Number(amountNok.replace(",", "."));
     if (Number.isNaN(parsedAmount) || parsedAmount < 0) {
-      setStatus("Ugyldig belop.");
+      setStatus("Ugyldig beløp.");
       return;
     }
 
@@ -119,7 +119,7 @@ export default function AdminTasksPage() {
             />
           </label>
           <label className="space-y-1.5">
-            <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Belop (kr)</span>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Beløp (kr)</span>
             <input
               value={amountNok}
               onChange={(e) => setAmountNok(e.target.value)}
@@ -155,7 +155,7 @@ export default function AdminTasksPage() {
           <thead className="bg-slate-800/70 text-slate-300">
             <tr>
               <th className="px-4 py-3">Tittel</th>
-              <th className="px-4 py-3">Belop</th>
+              <th className="px-4 py-3">Beløp</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Handling</th>
             </tr>
@@ -188,7 +188,7 @@ export default function AdminTasksPage() {
             {tasks.length === 0 && (
               <tr>
                 <td className="px-4 py-10 text-center text-slate-400" colSpan={4}>
-                  Ingen oppgaver enda. Lag den forste oppgaven over.
+                  Ingen oppgaver enda. Lag den første oppgaven over.
                 </td>
               </tr>
             )}

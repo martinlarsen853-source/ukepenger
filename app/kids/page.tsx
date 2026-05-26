@@ -51,14 +51,14 @@ export default function KidsPage() {
     <main className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 md:px-8 md:py-10">
       <div className="mx-auto max-w-6xl">
         <h1 className="mb-2 text-4xl font-black tracking-tight">Velg profil</h1>
-        <p className="mb-6 text-sm text-slate-300">Trykk pa en profil for a vise oppgaver.</p>
+        <p className="mb-6 text-sm text-slate-300">Trykk på en profil for å vise oppgaver.</p>
 
         {status && (
           <div className="mb-6 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-300">
             <div>{status}</div>
             {showKioskLink && (
               <Link href="/kiosk" className="mt-2 inline-flex text-slate-100 underline underline-offset-4">
-                Gaa til kiosk
+                Gå til kiosk
               </Link>
             )}
           </div>
@@ -78,7 +78,7 @@ export default function KidsPage() {
                   {avatar.emoji}
                 </div>
                 <div className="text-2xl font-black tracking-tight">{child.name}</div>
-                <div className="mt-2 text-sm font-semibold text-slate-900/80 group-hover:text-slate-900">Trykk for a fortsette</div>
+                <div className="mt-2 text-sm font-semibold text-slate-900/80 group-hover:text-slate-900">Trykk for å fortsette</div>
               </Link>
             );
           })}

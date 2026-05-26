@@ -68,11 +68,11 @@ export default function HeroDeviceDemo() {
           <p className="text-xs uppercase tracking-wide text-slate-500">Status</p>
           <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
             <p className="text-sm font-semibold text-emerald-800">Krav sendt</p>
-            <p className="mt-1 text-sm text-emerald-700">Venter paa godkjenning</p>
+            <p className="mt-1 text-sm text-emerald-700">Venter på godkjenning</p>
           </div>
           <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
             <p>Status: Sendt</p>
-            <p className="text-slate-500">Vi sier fra naar forelder har sett det.</p>
+            <p className="text-slate-500">Vi sier fra når forelder har sett det.</p>
           </div>
         </section>
 

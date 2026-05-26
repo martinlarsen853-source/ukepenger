@@ -124,7 +124,7 @@ export default function AdminDevicesPage() {
     <section className="space-y-5">
       <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
         <h3 className="mb-2 text-base font-semibold tracking-tight">Kiosk QR</h3>
-        <p className="mb-4 text-sm text-slate-300">Vis QR pa forelders telefon, skann pa iPad, og barnet lander rett pa /kids.</p>
+        <p className="mb-4 text-sm text-slate-300">Vis QR på forelders telefon, skann på iPad, og barnet lander rett på /kids.</p>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
