@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ensureFamilyForUser, getAdminSetupStatus } from "@/lib/family-client";
 import { supabase } from "@/lib/supabaseClient";
 
-type AuthAction = "login" | "signup" | "google" | "apple" | null;
+type AuthAction = "login" | "signup" | "google" | "apple" | "resend" | null;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const [action, setAction] = useState<AuthAction>(null);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
   const isLoading = action !== null;
 
@@ -44,7 +45,8 @@ export default function LoginPage() {
 
     if (!result.data.session) {
       setAction(null);
-      setStatus("Konto opprettet. Bekreft e-post for du logger inn.");
+      setAwaitingConfirmation(true);
+      setStatus("");
       return;
     }
 
@@ -61,6 +63,18 @@ export default function LoginPage() {
 
     await goAfterAuth();
     setAction(null);
+  };
+
+  const handleResend = async () => {
+    if (!email.trim()) return;
+    setAction("resend");
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    setAction(null);
+    if (error) {
+      setStatus(`Feil: ${error.message}`);
+    } else {
+      setStatus("Ny e-post sendt! Sjekk innboksen (og søppelpost).");
+    }
   };
 
   const handleLogin = async () => {
@@ -114,6 +128,50 @@ export default function LoginPage() {
 
   const isError = status.startsWith("Feil:");
   const canSubmit = email.trim().length > 0 && password.length > 0 && !isLoading;
+
+  if (awaitingConfirmation) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100">
+        <section className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl shadow-black/20 md:p-7">
+          <div className="mb-4 text-3xl">📬</div>
+          <h1 className="mb-2 text-2xl font-semibold tracking-tight">Sjekk e-posten din</h1>
+          <p className="text-sm text-slate-300">
+            Vi har sendt en bekreftelseslenke til <span className="font-medium text-slate-100">{email}</span>.
+            Klikk lenken for aa aktivere kontoen din.
+          </p>
+          <div className="mt-4 rounded-lg border border-amber-800 bg-amber-950/30 px-3 py-2.5 text-sm text-amber-200">
+            Finner du ikke e-posten? Sjekk <strong>søppelpost / spam</strong> – den kan havne der.
+          </div>
+          <div className="mt-5 flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => void handleResend()}
+              disabled={action === "resend"}
+              className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {action === "resend" ? "Sender..." : "Send e-post paa nytt"}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAwaitingConfirmation(false); setStatus(""); }}
+              className="w-full rounded-lg border border-slate-700 px-4 py-2.5 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-800"
+            >
+              Tilbake til innlogging
+            </button>
+          </div>
+          {status && (
+            <p className={`mt-4 rounded-lg border px-3 py-2 text-sm ${
+              status.startsWith("Feil:")
+                ? "border-red-800 bg-red-950/40 text-red-200"
+                : "border-emerald-800 bg-emerald-950/40 text-emerald-200"
+            }`}>
+              {status}
+            </p>
+          )}
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-slate-100">

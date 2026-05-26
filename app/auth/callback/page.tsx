@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import { ensureFamilyForUser, getAdminSetupStatus } from "@/lib/family-client";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -9,14 +9,41 @@ function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export default function AuthCallbackPage() {
+function AuthCallbackInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState("Fullforer innlogging...");
 
   useEffect(() => {
     let mounted = true;
 
     const run = async () => {
+      const code = searchParams.get("code");
+      const errorParam = searchParams.get("error");
+      const errorDescription = searchParams.get("error_description");
+
+      if (errorParam) {
+        if (mounted) {
+          const msg = errorDescription ?? errorParam;
+          if (msg.toLowerCase().includes("expired")) {
+            setStatus("Lenken har utlopt. Gaa tilbake til innlogging og be om en ny.");
+          } else {
+            setStatus(`Feil: ${msg}`);
+          }
+        }
+        return;
+      }
+
+      // PKCE flow: exchange the code for a session
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error) {
+          if (mounted) setStatus(`Feil: ${error.message}`);
+          return;
+        }
+      }
+
+      // Poll briefly for the session (covers implicit flow and small delays)
       for (let i = 0; i < 8; i += 1) {
         const sessionRes = await supabase.auth.getSession();
         const session = sessionRes.data.session;
@@ -43,7 +70,7 @@ export default function AuthCallbackPage() {
       }
 
       if (mounted) {
-        setStatus("Feil: Fant ikke aktiv sesjon etter OAuth. Prov igjen fra login.");
+        setStatus("Fant ikke aktiv sesjon. Lenken kan vaere utlopt – prov aa logge inn pa nytt.");
       }
     };
 
@@ -52,14 +79,50 @@ export default function AuthCallbackPage() {
     return () => {
       mounted = false;
     };
-  }, [router]);
+  }, [router, searchParams]);
+
+  const isError = status.startsWith("Feil:") || status.includes("utlopt") || status.includes("Fant ikke");
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-slate-100">
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 text-center">
-        <h1 className="text-xl font-semibold tracking-tight">OAuth callback</h1>
+        {!isError && (
+          <div className="mb-4 flex justify-center">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-600 border-t-slate-200" />
+          </div>
+        )}
+        <h1 className="text-xl font-semibold tracking-tight">
+          {isError ? "Noe gikk galt" : "Logger inn..."}
+        </h1>
         <p className="mt-3 text-sm text-slate-300">{status}</p>
+        {isError && (
+          <a
+            href="/login"
+            className="mt-5 inline-block rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-white"
+          >
+            Tilbake til innlogging
+          </a>
+        )}
       </div>
     </main>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-slate-100">
+          <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-6 text-center">
+            <div className="mb-4 flex justify-center">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-600 border-t-slate-200" />
+            </div>
+            <p className="text-sm text-slate-300">Fullforer innlogging...</p>
+          </div>
+        </main>
+      }
+    >
+      <AuthCallbackInner />
+    </Suspense>
   );
 }
