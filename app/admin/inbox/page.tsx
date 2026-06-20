@@ -10,7 +10,7 @@ type ClaimRow = {
   created_at: string;
   amount_ore: number;
   child_id: string;
-  task_id: string;
+  task_id: string | null;
   children: { name: string }[] | null;
   tasks: { title: string }[] | null;
 };
@@ -118,7 +118,10 @@ export default function AdminInboxPage() {
   };
 
   const getChildName = (item: ClaimRow) => childMap[item.child_id] ?? item.children?.[0]?.name ?? "Ukjent barn";
-  const getTaskTitle = (item: ClaimRow) => taskMap[item.task_id] ?? item.tasks?.[0]?.title ?? "Ukjent oppgave";
+  const getTaskTitle = (item: ClaimRow) => {
+    if (!item.task_id) return "Butikksalg";
+    return taskMap[item.task_id] ?? item.tasks?.[0]?.title ?? "Ukjent oppgave";
+  };
 
   if (loading) return <div className="text-slate-300">Laster...</div>;
   const isError = status.startsWith("Feil:");
