@@ -171,8 +171,14 @@ export default function KidsPage() {
       </div>
 
       {butikkOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center">
-          <div className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 sm:items-center"
+          onClick={closeButikk}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-100">Butikk</h2>
@@ -206,7 +212,7 @@ export default function KidsPage() {
             )}
 
             {butikkStep === "child" && (
-              <div className="space-y-3">
+              <div className="max-h-72 space-y-3 overflow-y-auto">
                 <button
                   type="button"
                   onClick={() => { setButikkStep("price"); setButikkStatus(""); }}
